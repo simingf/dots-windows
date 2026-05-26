@@ -4,24 +4,25 @@
     "actions": [],
     "defaultProfile": "{19823648-5b96-4089-8afc-3f10f5cced23}",
     "keybindings": [],
-    "newTabMenu": 
+    "newTabMenu":
     [
         {
             "type": "remainingProfiles"
         }
     ],
-    "profiles": 
+    "profiles":
     {
-        "defaults": 
+        "defaults":
         {
+            "colorScheme": "rose-pine",
             "elevate": true,
-            "font": 
+            "font":
             {
                 "face": "JetBrainsMono Nerd Font"
             },
             "startingDirectory": "%USERPROFILE%"
         },
-        "list": 
+        "list":
         [
             {
                 "commandline": "pwsh.exe",
@@ -31,6 +32,31 @@
             }
         ]
     },
-    "schemes": [],
+    "schemes":
+    [
+        {
+            "name": "rose-pine",
+            "cursorColor": "#6e6a86",
+            "selectionBackground": "#403d52",
+            "background": "#191724",
+            "foreground": "#e0def4",
+            "black": "#26233a",
+            "blue": "#9ccfd8",
+            "cyan": "#ebbcba",
+            "green": "#31748f",
+            "purple": "#c4a7e7",
+            "red": "#eb6f92",
+            "white": "#e0def4",
+            "yellow": "#f6c177",
+            "brightBlack": "#908caa",
+            "brightBlue": "#9ccfd8",
+            "brightCyan": "#ebbcba",
+            "brightGreen": "#31748f",
+            "brightPurple": "#c4a7e7",
+            "brightRed": "#eb6f92",
+            "brightWhite": "#e0def4",
+            "brightYellow": "#f6c177"
+        }
+    ],
     "themes": []
 }
