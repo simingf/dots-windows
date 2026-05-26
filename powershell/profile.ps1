@@ -50,8 +50,17 @@ if (Get-Command oh-my-posh -ErrorAction SilentlyContinue) {
 
 # -- Tool integrations -------------------------------------------------------
 # zoxide - `cd` becomes the smart jumper (mirror `zoxide init --cmd cd zsh`).
+# After the jump, clear screen and re-list — same effect as a zsh chpwd hook.
+# zoxide installs `cd` as an alias to __zoxide_z; aliases beat functions in PS
+# resolution, so we drop it before defining our wrapper.
 if (Get-Command zoxide -ErrorAction SilentlyContinue) {
     Invoke-Expression (& { (zoxide init --cmd cd powershell | Out-String) })
+    Remove-Item alias:cd -Force -ErrorAction SilentlyContinue
+    function cd {
+        __zoxide_z @args
+        Clear-Host
+        ls
+    }
 }
 
 # fzf integration via PSFzf (Ctrl+T file picker, Ctrl+R history fuzzy search).
@@ -109,15 +118,16 @@ function which {
 }
 
 # -- Directory navigation ----------------------------------------------------
-function .. { Set-Location .. }
-function ... { Set-Location ../.. }
+# Route through `cd` so the zoxide+clear+ls wrapper fires.
+function .. { cd .. }
+function ... { cd ../.. }
 
-function doc  { Set-Location "$env:USERPROFILE\Documents" }
-function dow  { Set-Location "$env:USERPROFILE\Downloads" }
-function des  { Set-Location "$env:USERPROFILE\Desktop" }
-function dots { Set-Location "$env:USERPROFILE\dots-windows" }
+function doc  { cd "$env:USERPROFILE\Documents" }
+function dow  { cd "$env:USERPROFILE\Downloads" }
+function des  { cd "$env:USERPROFILE\Desktop" }
+function dots { cd "$env:USERPROFILE\dots-windows" }
 # `cf` on mac jumped to ~/.config; on Windows the closest analog is the dots repo.
-function cf   { Set-Location "$env:USERPROFILE\dots-windows" }
+function cf   { cd "$env:USERPROFILE\dots-windows" }
 
 # -- Config-edit shortcuts ---------------------------------------------------
 # `zrc` kept as the muscle-memory name even though we're editing pwsh's profile.
