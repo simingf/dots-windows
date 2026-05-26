@@ -1,5 +1,6 @@
 {
     "$schema": "https://aka.ms/terminal-profiles-schema",
+    "defaultTerminal": "Windows Terminal",
     "defaultProfile": "{19823648-5b96-4089-8afc-3f10f5cced23}",
     "profiles": {
         "defaults": {
