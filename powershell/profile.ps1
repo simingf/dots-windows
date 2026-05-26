@@ -84,7 +84,10 @@ if (Get-Command btop -ErrorAction SilentlyContinue) { Set-Alias top btop }
 if (Get-Command lazygit -ErrorAction SilentlyContinue) { Set-Alias lg lazygit }
 
 # eza if installed (`scoop install eza` / `cargo install eza`).
+# PS resolves aliases before functions, so the built-in `ls` alias (for
+# Get-ChildItem) shadows our function unless we drop it first.
 if (Get-Command eza -ErrorAction SilentlyContinue) {
+    Remove-Item alias:ls -Force -ErrorAction SilentlyContinue
     function ls { eza --icons=auto --hyperlink @args }
     function ll { eza -la --git --icons=auto --hyperlink @args }
     function lt { eza --tree --level=2 -a --git-ignore --icons=auto --hyperlink @args }
