@@ -93,6 +93,21 @@ if (Get-Command eza -ErrorAction SilentlyContinue) {
     function lt { eza --tree --level=2 -a --git-ignore --icons=auto --hyperlink @args }
 }
 
+# -- which (mirror zsh) ------------------------------------------------------
+# Alias -> target, function -> body, exe -> path, cmdlet -> note.
+function which {
+    param([Parameter(Mandatory)] [string] $Name)
+    $cmd = Get-Command $Name -ErrorAction SilentlyContinue
+    if (-not $cmd) { Write-Error "$Name not found"; return }
+    switch ($cmd.CommandType) {
+        'Alias'       { "${Name}: aliased to $($cmd.Definition)" }
+        'Function'    { "${Name} () {`n$($cmd.Definition)`n}" }
+        'Cmdlet'      { "${Name}: cmdlet" }
+        'Application' { $cmd.Source }
+        default       { "${Name}: $($cmd.CommandType) - $($cmd.Definition)" }
+    }
+}
+
 # -- Directory navigation ----------------------------------------------------
 function .. { Set-Location .. }
 function ... { Set-Location ../.. }
