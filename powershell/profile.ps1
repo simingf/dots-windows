@@ -71,7 +71,9 @@ if (Get-Module -ListAvailable -Name PSFzf) {
 }
 
 # -- Aliases -----------------------------------------------------------------
-Set-Alias -Name e -Value exit
+# `exit` is a language keyword, not a cmdlet — Set-Alias can't target it,
+# so wrap in a function. nvim is a real exe so Set-Alias is fine.
+function e { exit }
 Set-Alias -Name v -Value nvim
 
 # `c`: clear and re-list (mirror dots-linux pattern, not Mac's conda dispatcher).
