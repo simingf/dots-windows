@@ -11,7 +11,13 @@
             },
             "startingDirectory": "%USERPROFILE%"
         },
-        "list": []
+        "list": [
+            {
+                "name": "PowerShell",
+                "source": "Windows.Terminal.PowershellCore",
+                "elevate": true
+            }
+        ]
     },
     "schemes": [],
     "actions": []
