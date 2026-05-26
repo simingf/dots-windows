@@ -64,7 +64,21 @@ if (Get-Module -ListAvailable -Name PSFzf) {
 # -- Aliases -----------------------------------------------------------------
 Set-Alias -Name e -Value exit
 Set-Alias -Name v -Value nvim
-Set-Alias -Name c -Value Clear-Host
+
+# `c`: clear and re-list (mirror dots-linux pattern, not Mac's conda dispatcher).
+function c { Clear-Host; ls }
+
+# Open current dir in Explorer (mirror Mac `f='open .'`).
+function f { Invoke-Item . }
+
+# Global npm packages (mirror Mac `npmg`).
+function npmg { npm list -g --depth 0 }
+
+# Competitive build+run (mirror Mac `cpr='make && ./sol'`).
+function cpr {
+    make
+    if ($LASTEXITCODE -eq 0) { & "./sol" }
+}
 
 if (Get-Command btop -ErrorAction SilentlyContinue) { Set-Alias top btop }
 if (Get-Command lazygit -ErrorAction SilentlyContinue) { Set-Alias lg lazygit }
@@ -98,14 +112,18 @@ function ch  {
     Clear-Host
 }
 
-# -- Clipboard pwd (mirror `alias pwd='pwd | tee >(pbcopy)'`) ----------------
-# Defined as a function so it shadows the built-in `pwd` alias only for
-# interactive use; scripts should use Get-Location directly.
+# -- Clipboard ---------------------------------------------------------------
+# `pwd` shadows the built-in alias for interactive use (also copies path);
+# scripts should use Get-Location directly.
 function pwd {
     $p = (Get-Location).Path
     $p | Set-Clipboard
     Write-Output $p
 }
+
+# Mac compatibility shims so muscle-memory pipelines work on Windows.
+function pbcopy  { $input | Set-Clipboard }
+function pbpaste { Get-Clipboard }
 
 # -- Update / upgrade --------------------------------------------------------
 if (Get-Command topgrade -ErrorAction SilentlyContinue) {

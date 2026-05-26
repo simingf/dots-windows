@@ -93,9 +93,14 @@ New-Link -Source "$Repo\powershell\profile.ps1"    -Target "$docs\WindowsPowerSh
 New-Link -Source "$Repo\windowsterminal\settings.json" -Target "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
 
 # -- 2. Env vars -------------------------------------------------------------
+# Avoid [Environment]::SetEnvironmentVariable(..., 'User') — it broadcasts
+# WM_SETTINGCHANGE synchronously to every top-level window and can hang for
+# minutes if any of them isn't pumping messages. Writing HKCU:\Environment
+# directly is instant; new processes pick it up at launch.
 Step "Env vars (User scope)"
 $rgPath = Join-Path $Repo 'ripgrep\rg.conf'
-[Environment]::SetEnvironmentVariable('RIPGREP_CONFIG_PATH', $rgPath, 'User')
+Set-ItemProperty -Path 'HKCU:\Environment' -Name 'RIPGREP_CONFIG_PATH' -Value $rgPath -Type String
+$env:RIPGREP_CONFIG_PATH = $rgPath
 Info "RIPGREP_CONFIG_PATH = $rgPath"
 
 if ($LinksOnly) {
