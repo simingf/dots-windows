@@ -59,6 +59,14 @@ function Copy-Push {
     if ($parent -and -not (Test-Path -LiteralPath $parent)) {
         New-Item -ItemType Directory -Path $parent -Force | Out-Null
     }
+    # If $Target is an existing symlink, Copy-Item -Force writes *through* the
+    # link instead of replacing it, defeating the whole point. Drop it first.
+    if (Test-Path -LiteralPath $Target) {
+        $existing = Get-Item -LiteralPath $Target -Force -ErrorAction SilentlyContinue
+        if ($existing.LinkType -eq 'SymbolicLink') {
+            Remove-Item -LiteralPath $Target -Force
+        }
+    }
     Copy-Item -LiteralPath $Source -Destination $Target -Force
     Info "Copied $Target"
 }

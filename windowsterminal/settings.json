@@ -1,32 +1,21 @@
 {
-    "$help": "https://aka.ms/terminal-documentation",
     "$schema": "https://aka.ms/terminal-profiles-schema",
-    "actions": [],
-    "defaultProfile": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
-    "keybindings": [],
-    "newTabMenu": 
-    [
-        {
-            "type": "remainingProfiles"
-        }
-    ],
-    "profiles": 
-    {
-        "defaults": {},
-        "list": 
-        [
-            {
-                "guid": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
-                "hidden": false,
-                "name": "Windows PowerShell"
+    "defaultProfile": "{19823648-5b96-4089-8afc-3f10f5cced23}",
+    "profiles": {
+        "defaults": {
+            "font": {
+                "face": "JetBrainsMono Nerd Font"
             },
+            "startingDirectory": "%USERPROFILE%",
+            "elevate": true
+        },
+        "list": [
             {
-                "guid": "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}",
-                "hidden": false,
-                "name": "Command Prompt"
+                "guid": "{19823648-5b96-4089-8afc-3f10f5cced23}",
+                "name": "PowerShell",
+                "commandline": "pwsh.exe",
+                "icon": "ms-appx:///ProfileIcons/{61c54bbd-c2c6-5271-96e7-009a87ff44bf}.png"
             }
         ]
-    },
-    "schemes": [],
-    "themes": []
+    }
 }
