@@ -2,7 +2,7 @@
 # Apply dots-windows.
 #
 # Default: link configs, set env vars, install tools (winget), font, PSFzf,
-# baseline git config, VS Code extensions. Idempotent — safe to re-run.
+# baseline git config, VS Code extensions. Idempotent - safe to re-run.
 #
 # Flags:
 #   -LinksOnly                Skip everything except symlinks + env vars.
@@ -25,7 +25,7 @@ function Step($msg) { Write-Host "==> $msg" -ForegroundColor Cyan }
 function Info($msg) { Write-Host "    $msg" }
 function Warn($msg) { Write-Host "!!  $msg" -ForegroundColor Yellow }
 
-# ── 0. Precheck: can we create symlinks? ────────────────────────────────────
+# -- 0. Precheck: can we create symlinks? ------------------------------------
 function Test-CanSymlink {
     $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)
     if ($isAdmin) { return $true }
@@ -76,7 +76,7 @@ function New-Link {
     }
 }
 
-# ── 1. Symlinks ─────────────────────────────────────────────────────────────
+# -- 1. Symlinks -------------------------------------------------------------
 Step "Repo: $Repo"
 
 Step "Symlinks"
@@ -88,7 +88,7 @@ New-Link -Source "$Repo\lazygit\config.yml"        -Target "$env:APPDATA\lazygit
 New-Link -Source "$Repo\claude\CLAUDE.md"          -Target "$env:USERPROFILE\.claude\CLAUDE.md"
 New-Link -Source "$Repo\powershell\profile.ps1"    -Target $PROFILE.CurrentUserAllHosts
 
-# ── 2. Env vars ─────────────────────────────────────────────────────────────
+# -- 2. Env vars -------------------------------------------------------------
 Step "Env vars (User scope)"
 $rgPath = Join-Path $Repo 'ripgrep\rg.conf'
 [Environment]::SetEnvironmentVariable('RIPGREP_CONFIG_PATH', $rgPath, 'User')
@@ -100,7 +100,7 @@ if ($LinksOnly) {
     return
 }
 
-# ── 3. winget tools ─────────────────────────────────────────────────────────
+# -- 3. winget tools ---------------------------------------------------------
 function Winget-Install {
     param([Parameter(Mandatory)] [string] $Id)
     & winget install --id $Id --silent --accept-source-agreements --accept-package-agreements 2>&1 |
@@ -111,12 +111,12 @@ function Winget-Install {
         $LASTEXITCODE -eq -1978335189) {
         Info "OK    $Id"
     } else {
-        Warn "winget install $Id failed (exit $LASTEXITCODE) — continuing"
+        Warn "winget install $Id failed (exit $LASTEXITCODE) - continuing"
     }
 }
 
 if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
-    Warn "winget not found — skipping tool installs."
+    Warn "winget not found - skipping tool installs."
     Warn "Install App Installer from Microsoft Store, then re-run."
 } else {
     Step "winget tools"
@@ -142,17 +142,17 @@ if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
                 [Environment]::GetEnvironmentVariable('PATH','User')
 }
 
-# ── 4. Nerd Font ────────────────────────────────────────────────────────────
+# -- 4. Nerd Font ------------------------------------------------------------
 if (Get-Command oh-my-posh -ErrorAction SilentlyContinue) {
     Step "JetBrainsMono Nerd Font"
     & oh-my-posh font install JetBrainsMono 2>&1 | Out-Null
     if ($LASTEXITCODE -eq 0) { Info "OK" }
     else { Warn "oh-my-posh font install failed (exit $LASTEXITCODE)" }
 } else {
-    Warn "oh-my-posh not on PATH yet — open a new shell after winget step, then re-run."
+    Warn "oh-my-posh not on PATH yet - open a new shell after winget step, then re-run."
 }
 
-# ── 5. PowerShell modules ───────────────────────────────────────────────────
+# -- 5. PowerShell modules ---------------------------------------------------
 Step "PowerShell modules"
 if (-not (Get-Module -ListAvailable -Name PSFzf)) {
     Install-Module PSFzf -Scope CurrentUser -Force -AcceptLicense
@@ -161,7 +161,7 @@ if (-not (Get-Module -ListAvailable -Name PSFzf)) {
     Info "OK    PSFzf"
 }
 
-# ── 6. git baseline config ──────────────────────────────────────────────────
+# -- 6. git baseline config --------------------------------------------------
 if (Get-Command git -ErrorAction SilentlyContinue) {
     Step "git config (global)"
     git config --global push.autoSetupRemote true
@@ -190,10 +190,10 @@ if (Get-Command git -ErrorAction SilentlyContinue) {
     if ($GitUserEmail) { git config --global user.email $GitUserEmail }
     Info "OK"
 } else {
-    Warn "git not on PATH yet — open a new shell after winget step, then re-run."
+    Warn "git not on PATH yet - open a new shell after winget step, then re-run."
 }
 
-# ── 7. VS Code extensions ───────────────────────────────────────────────────
+# -- 7. VS Code extensions ---------------------------------------------------
 if (Get-Command code -ErrorAction SilentlyContinue) {
     Step "VS Code extensions"
     @('mvllow.rose-pine', 'vscode-icons-team.vscode-icons') | ForEach-Object {
@@ -201,25 +201,25 @@ if (Get-Command code -ErrorAction SilentlyContinue) {
         if ($LASTEXITCODE -eq 0) { Info "OK    $_" } else { Warn "  $_ failed" }
     }
 } else {
-    Warn "code not on PATH yet — open a new shell after winget step, then re-run."
+    Warn "code not on PATH yet - open a new shell after winget step, then re-run."
 }
 
-# ── 8. gh auth (browser flow) ───────────────────────────────────────────────
+# -- 8. gh auth (browser flow) -----------------------------------------------
 if (Get-Command gh -ErrorAction SilentlyContinue) {
     Step "gh auth (github.com)"
     & gh auth status --hostname github.com 2>&1 | Out-Null
     if ($LASTEXITCODE -eq 0) {
         Info "OK    already authenticated"
     } else {
-        Info "Launching browser for github.com OAuth — copy the one-time code, click Authorize, return here."
+        Info "Launching browser for github.com OAuth - copy the one-time code, click Authorize, return here."
         & gh auth login --hostname github.com --git-protocol https --web
         if ($LASTEXITCODE -ne 0) { Warn "gh auth login failed (exit $LASTEXITCODE)" }
     }
 } else {
-    Warn "gh not on PATH yet — open a new shell after winget step, then re-run."
+    Warn "gh not on PATH yet - open a new shell after winget step, then re-run."
 }
 
-# ── 9. Whatever's left ──────────────────────────────────────────────────────
+# -- 9. Whatever's left ------------------------------------------------------
 Write-Host ""
 Write-Host "================ Still manual ================" -ForegroundColor Yellow
 $leftovers = @()
@@ -228,7 +228,7 @@ if (Get-Command git -ErrorAction SilentlyContinue) {
     $haveEmail = [bool](git config --global --get user.email)
     if (-not $haveName -or -not $haveEmail) {
         $leftovers += @"
-git identity not set — re-run apply.ps1 (it'll prompt) or:
+git identity not set - re-run apply.ps1 (it'll prompt) or:
   git config --global user.name  "Your Name"
   git config --global user.email "you@example.com"
 "@

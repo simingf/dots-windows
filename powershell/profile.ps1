@@ -4,13 +4,13 @@
 #
 # What was intentionally skipped from the zsh side:
 #   - Homebrew shellenv               (no brew on Windows)
-#   - eza/trash/pbcopy/kitten aliases (Mac-only tools — eza et al. work if
+#   - eza/trash/pbcopy/kitten aliases (Mac-only tools - eza et al. work if
 #                                      installed via scoop/cargo, see below)
 #   - tmux helpers (tn/ta/tk/runall)  (no native tmux on Windows)
 #   - DEC 2031 / mouse-tracking hooks (ghostty-specific, irrelevant here)
 #   - conda / nvm lazy-loaders        (paths differ; add when miniconda/nvm-windows install)
 
-# ── PSReadLine ──────────────────────────────────────────────────────────────
+# -- PSReadLine --------------------------------------------------------------
 # History: 5000 entries, no dups (mirrors HISTSIZE/hist_ignore_all_dups).
 Set-PSReadLineOption -MaximumHistoryCount 5000
 Set-PSReadLineOption -HistoryNoDuplicates
@@ -30,19 +30,19 @@ Set-PSReadLineKeyHandler -Chord 'Ctrl+n' -Function HistorySearchForward
 Set-PSReadLineKeyHandler -Chord 'Tab'        -Function MenuComplete
 Set-PSReadLineKeyHandler -Chord 'Shift+Tab'  -Function Complete
 
-# ── Env vars ────────────────────────────────────────────────────────────────
+# -- Env vars ----------------------------------------------------------------
 $env:EDITOR = 'nvim'
 $env:RIPGREP_CONFIG_PATH = "$env:USERPROFILE\dots-windows\ripgrep\rg.conf"
 Remove-Item env:GH_TOKEN -ErrorAction SilentlyContinue
 
-# ── Prompt (oh-my-posh) ─────────────────────────────────────────────────────
+# -- Prompt (oh-my-posh) -----------------------------------------------------
 if (Get-Command oh-my-posh -ErrorAction SilentlyContinue) {
     oh-my-posh init pwsh --config "$env:USERPROFILE\dots-windows\ohmyposh\zen.toml" |
         Invoke-Expression
 }
 
-# ── Tool integrations ───────────────────────────────────────────────────────
-# zoxide — `cd` becomes the smart jumper (mirror `zoxide init --cmd cd zsh`).
+# -- Tool integrations -------------------------------------------------------
+# zoxide - `cd` becomes the smart jumper (mirror `zoxide init --cmd cd zsh`).
 if (Get-Command zoxide -ErrorAction SilentlyContinue) {
     Invoke-Expression (& { (zoxide init --cmd cd powershell | Out-String) })
 }
@@ -54,7 +54,7 @@ if (Get-Module -ListAvailable -Name PSFzf) {
                     -PSReadlineChordReverseHistory 'Ctrl+r'
 }
 
-# ── Aliases ─────────────────────────────────────────────────────────────────
+# -- Aliases -----------------------------------------------------------------
 Set-Alias -Name e -Value exit
 Set-Alias -Name v -Value nvim
 
@@ -68,7 +68,7 @@ if (Get-Command eza -ErrorAction SilentlyContinue) {
     function lt { eza --tree --level=2 -a --git-ignore --icons=auto --hyperlink @args }
 }
 
-# ── Directory navigation ────────────────────────────────────────────────────
+# -- Directory navigation ----------------------------------------------------
 function .. { Set-Location .. }
 function ... { Set-Location ../.. }
 
@@ -79,7 +79,7 @@ function dots { Set-Location "$env:USERPROFILE\dots-windows" }
 # `cf` on mac jumped to ~/.config; on Windows the closest analog is the dots repo.
 function cf   { Set-Location "$env:USERPROFILE\dots-windows" }
 
-# ── Config-edit shortcuts ───────────────────────────────────────────────────
+# -- Config-edit shortcuts ---------------------------------------------------
 # `zrc` kept as the muscle-memory name even though we're editing pwsh's profile.
 function zrc { nvim $PROFILE.CurrentUserAllHosts }
 function nrc { nvim "$env:LOCALAPPDATA\nvim\init.lua" }
@@ -90,7 +90,7 @@ function ch  {
     Clear-Host
 }
 
-# ── Clipboard pwd (mirror `alias pwd='pwd | tee >(pbcopy)'`) ────────────────
+# -- Clipboard pwd (mirror `alias pwd='pwd | tee >(pbcopy)'`) ----------------
 # Defined as a function so it shadows the built-in `pwd` alias only for
 # interactive use; scripts should use Get-Location directly.
 function pwd {
@@ -99,12 +99,12 @@ function pwd {
     Write-Output $p
 }
 
-# ── Update / upgrade ────────────────────────────────────────────────────────
+# -- Update / upgrade --------------------------------------------------------
 if (Get-Command topgrade -ErrorAction SilentlyContinue) {
     function up { topgrade -t -y --no-retry }
 }
 
-# ── Editors ─────────────────────────────────────────────────────────────────
+# -- Editors -----------------------------------------------------------------
 # Pick code or cursor via fzf, like the zsh `k` function.
 function k {
     if (-not (Get-Command fzf -ErrorAction SilentlyContinue)) {
@@ -115,13 +115,13 @@ function k {
     if ($args.Count -eq 0) { & $editor . } else { & $editor @args }
 }
 
-# ── Python shorthand ────────────────────────────────────────────────────────
+# -- Python shorthand --------------------------------------------------------
 function p {
     if ($args.Count -eq 0) { Write-Output 'python: no file given'; return }
     python @args
 }
 
-# ── PR fetch (mirror gotopr) ────────────────────────────────────────────────
+# -- PR fetch (mirror gotopr) ------------------------------------------------
 function gotopr {
     param([Parameter(Mandatory)] [string] $Url)
     if ($Url -notmatch 'https://([^/]+)/([^/]+)/([^/]+)/pull/(\d+)') {
