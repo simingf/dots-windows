@@ -1,0 +1,96 @@
+**********************
+PowerShell transcript start
+Start time: 20260525223837
+Username: DESKTOP-KTF8EOJ\sim
+RunAs User: DESKTOP-KTF8EOJ\sim
+Configuration Name: 
+Machine: DESKTOP-KTF8EOJ (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Program Files\WindowsApps\Microsoft.PowerShell_7.6.2.0_x64__8wekyb3d8bbwe\pwsh.dll
+Process ID: 6876
+PSVersion: 7.6.2
+PSEdition: Core
+GitCommitId: 7.6.2
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+=== nvim --version ===
+NVIM v0.12.2
+Build type: Release
+LuaJIT 2.1.1774638290
+Run "nvim -V1 -v" for more info
+
+=== Tools Mason expects on PATH ===
+  git        C:\Program Files\Git\cmd\git.exe
+  curl       C:\Windows\system32\curl.exe
+  tar        C:\Windows\system32\tar.exe
+  unzip      MISSING
+  go         MISSING
+  gofmt      MISSING
+  dotnet     C:\Program Files\dotnet\dotnet.exe
+  python     C:\Users\sim\AppData\Local\Microsoft\WindowsApps\python.exe
+  pip        MISSING
+  cargo      MISSING
+  npm        MISSING
+  node       MISSING
+
+=== Headless nvim startup (captures notify/error output) ===
+---MESSAGES------MESSAGES---
+
+=== Mason data dir contents ===
+  C:\Users\sim\AppData\Local\nvim-data\mason
+    bin
+    packages
+    registries
+    share
+    staging
+    system_packages
+
+  bin/:
+    clangd.cmd
+    lua-language-server.cmd
+    roslyn-language-server.cmd
+    roslyn.cmd
+    shfmt.cmd
+    stylua.cmd
+
+=== Lazy plugin state ===
+arrow.nvim
+blink.cmp
+conform.nvim
+flash.nvim
+friendly-snippets
+gitsigns.nvim
+indent-blankline.nvim
+lazy.nvim
+lazydev.nvim
+lualine-diagnostic-message
+lualine.nvim
+mason-lspconfig.nvim
+mason-tool-installer.nvim
+mason.nvim
+mini.cursorword
+mini.pairs
+nvim-lspconfig
+nvim-recorder
+nvim-treesitter
+nvim-treesitter-context
+nvim-treesitter-textobjects
+nvim-web-devicons
+plenary.nvim
+readme
+rose-pine
+roslyn.nvim
+snacks.nvim
+todo-comments.nvim
+trouble.nvim
+vim-repeat
+which-key.nvim
+yanky.nvim
+**********************
+PowerShell transcript end
+End time: 20260525223839
+**********************
