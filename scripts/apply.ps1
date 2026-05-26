@@ -155,7 +155,10 @@ if (Get-Command oh-my-posh -ErrorAction SilentlyContinue) {
 # -- 5. PowerShell modules ---------------------------------------------------
 Step "PowerShell modules"
 if (-not (Get-Module -ListAvailable -Name PSFzf)) {
-    Install-Module PSFzf -Scope CurrentUser -Force -AcceptLicense
+    if ((Get-PSRepository -Name PSGallery).InstallationPolicy -ne 'Trusted') {
+        Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
+    }
+    Install-Module PSFzf -Scope CurrentUser -Force
     Info "Installed PSFzf"
 } else {
     Info "OK    PSFzf"
