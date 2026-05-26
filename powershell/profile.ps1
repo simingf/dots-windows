@@ -20,8 +20,15 @@ Set-PSReadLineOption -HistorySearchCursorMovesToEnd
 Set-PSReadLineOption -EditMode Emacs
 
 # Replaces zsh-autosuggestions: gray inline ghost text from history + plugins.
-Set-PSReadLineOption -PredictionSource HistoryAndPlugin
-Set-PSReadLineOption -PredictionViewStyle ListView
+# Needs PSReadLine 2.1+ (Source) / 2.2+ (ViewStyle). Windows PowerShell 5.1
+# ships with 2.0.0 — skip there. pwsh (PS7) has a new enough version.
+$psrl = Get-Command Set-PSReadLineOption -ErrorAction SilentlyContinue
+if ($psrl.Parameters.ContainsKey('PredictionSource')) {
+    Set-PSReadLineOption -PredictionSource HistoryAndPlugin
+}
+if ($psrl.Parameters.ContainsKey('PredictionViewStyle')) {
+    Set-PSReadLineOption -PredictionViewStyle ListView
+}
 
 # Mirror zsh keybindings for history search.
 Set-PSReadLineKeyHandler -Chord 'Ctrl+p' -Function HistorySearchBackward
