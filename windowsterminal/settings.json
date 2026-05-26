@@ -1,0 +1,18 @@
+{
+    "$help": "https://aka.ms/terminal-documentation",
+    "$schema": "https://aka.ms/terminal-profiles-schema",
+    "defaultProfile": "PowerShell",
+    "copyOnSelect": false,
+    "copyFormatting": "none",
+    "profiles": {
+        "defaults": {
+            "font": {
+                "face": "JetBrainsMono Nerd Font"
+            },
+            "startingDirectory": "%USERPROFILE%"
+        },
+        "list": []
+    },
+    "schemes": [],
+    "actions": []
+}

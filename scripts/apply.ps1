@@ -87,6 +87,7 @@ New-Link -Source "$Repo\gh\config.yml"             -Target "$env:APPDATA\GitHub 
 New-Link -Source "$Repo\lazygit\config.yml"        -Target "$env:APPDATA\lazygit\config.yml"
 New-Link -Source "$Repo\claude\CLAUDE.md"          -Target "$env:USERPROFILE\.claude\CLAUDE.md"
 New-Link -Source "$Repo\powershell\profile.ps1"    -Target $PROFILE.CurrentUserAllHosts
+New-Link -Source "$Repo\windowsterminal\settings.json" -Target "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
 
 # -- 2. Env vars -------------------------------------------------------------
 Step "Env vars (User scope)"
@@ -130,6 +131,7 @@ if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
         'JesseDuffield.lazygit',
         'JanDeDobbeleer.OhMyPosh',
         'Microsoft.VisualStudioCode',
+        'Microsoft.WindowsTerminal',
         'ajeetdsouza.zoxide',
         'eza-community.eza',
         'junegunn.fzf'
