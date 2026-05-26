@@ -171,7 +171,14 @@ if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
         'Microsoft.WindowsTerminal',
         'ajeetdsouza.zoxide',
         'eza-community.eza',
-        'junegunn.fzf'
+        'junegunn.fzf',
+        # Toolchains Mason needs to install nvim LSPs/formatters/linters.
+        # Go: gopls, goimports, gofumpt. Node: pyright, bashls.
+        # Python: ruff (Mason's package shells out to python). LLVM: clang-format.
+        'GoLang.Go',
+        'OpenJS.NodeJS.LTS',
+        'Python.Python.3.13',
+        'LLVM.LLVM'
     ) | ForEach-Object { Winget-Install $_ }
 
     # winget put binaries on PATH (in registry), but the running session still
