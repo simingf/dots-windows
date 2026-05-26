@@ -5,6 +5,14 @@ Native PowerShell setup (no WSL).
 
 ## Apply
 
+A fresh Windows install has no git. Bootstrap it via winget first, then close and reopen PowerShell so `git` lands on PATH:
+
+```powershell
+winget install --id Git.Git -e --accept-source-agreements --accept-package-agreements
+```
+
+Then clone and run:
+
 ```powershell
 git clone <this-repo> $env:USERPROFILE\dots-windows
 cd $env:USERPROFILE\dots-windows
@@ -67,6 +75,16 @@ cp    ~/dots-macos/.claude/CLAUDE.md                               ~/dots-window
 - `Brewfile`, `scripts/`, `manual/` — macOS-only tooling
 - `.gitconfig` — too many macOS-specific paths (GCM, Homebrew gh, /Users/sfeng); write fresh
 - `Library/Preferences/sapling/` — macOS-only
+
+## Gotchas
+
+**Keep `.ps1` files pure ASCII.** Windows PowerShell 5.1 reads scripts as the OS ANSI codepage unless the file has a UTF-8 BOM. Any em-dash (`—`), box-drawing char (`─`), or other non-ASCII byte gets mis-decoded and the parser then throws confusing _"missing closing bracket"_ errors a few lines later. Check before committing:
+
+```bash
+LC_ALL=C grep -nP '[^\x00-\x7f]' scripts/apply.ps1 powershell/profile.ps1
+```
+
+(macOS editors tend to strip BOMs on save, so just sticking to ASCII is the durable fix.)
 
 ## TODO
 
