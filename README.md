@@ -11,6 +11,12 @@ cd $env:USERPROFILE\dots-windows
 .\scripts\apply.ps1
 ```
 
+If PowerShell complains _"running scripts is disabled on this system"_, set the execution policy once:
+
+```powershell
+Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
+```
+
 `apply.ps1` does, in order: symlinks → `RIPGREP_CONFIG_PATH` → winget installs (Git, gh, Neovim, ripgrep, fd, lazygit, oh-my-posh, VS Code, zoxide, eza, fzf, PS7) → JetBrainsMono Nerd Font → PSFzf module → baseline `git config` → VS Code extensions. It's idempotent — re-running is cheap.
 
 Flags:
