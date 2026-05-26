@@ -70,7 +70,7 @@ function New-Link {
         New-Item -ItemType SymbolicLink -Path $Target -Target $Source -Force | Out-Null
         Info "Linked $Target -> $Source"
     } catch {
-        Warn "Failed to link $Target: $($_.Exception.Message)"
+        Warn "Failed to link ${Target}: $($_.Exception.Message)"
         Warn "Enable Developer Mode (Settings > For developers) or run as Administrator, then re-run."
         throw
     }
