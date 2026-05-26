@@ -255,7 +255,18 @@ if (Get-Command code -ErrorAction SilentlyContinue) {
     Warn "code not on PATH yet - open a new shell after winget step, then re-run."
 }
 
-# -- 8. gh auth (browser flow) -----------------------------------------------
+# -- 8. Claude Code (npm global) ---------------------------------------------
+# Anthropic ships claude-code via npm; needs Node from the winget step above.
+if (Get-Command npm -ErrorAction SilentlyContinue) {
+    Step "Claude Code"
+    & npm install -g @anthropic-ai/claude-code 2>&1 | Out-Null
+    if ($LASTEXITCODE -eq 0) { Info "OK" }
+    else { Warn "npm install -g @anthropic-ai/claude-code failed (exit $LASTEXITCODE)" }
+} else {
+    Warn "npm not on PATH yet - open a new shell after winget step, then re-run."
+}
+
+# -- 9. gh auth (browser flow) -----------------------------------------------
 if (Get-Command gh -ErrorAction SilentlyContinue) {
     Step "gh auth (github.com)"
     & gh auth status --hostname github.com 2>&1 | Out-Null
@@ -270,7 +281,7 @@ if (Get-Command gh -ErrorAction SilentlyContinue) {
     Warn "gh not on PATH yet - open a new shell after winget step, then re-run."
 }
 
-# -- 9. Whatever's left ------------------------------------------------------
+# -- 10. Whatever's left -----------------------------------------------------
 Write-Host ""
 Write-Host "================ Still manual ================" -ForegroundColor Yellow
 $leftovers = @()

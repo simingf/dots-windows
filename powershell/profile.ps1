@@ -159,6 +159,9 @@ function k {
     if ($args.Count -eq 0) { & $editor . } else { & $editor @args }
 }
 
+# Claude Code with permission prompts off (yolo mode).
+function kk { claude --dangerously-skip-permissions @args }
+
 # -- Python shorthand --------------------------------------------------------
 function p {
     if ($args.Count -eq 0) { Write-Output 'python: no file given'; return }
