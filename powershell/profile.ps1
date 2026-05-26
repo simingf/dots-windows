@@ -1,0 +1,145 @@
+# PowerShell profile, translated from dots-macos/.zshrc.
+# Symlinked to $PROFILE.CurrentUserAllHosts by scripts/apply.ps1, so it loads
+# in pwsh, Windows PowerShell, and VS Code's integrated terminal.
+#
+# What was intentionally skipped from the zsh side:
+#   - Homebrew shellenv               (no brew on Windows)
+#   - eza/trash/pbcopy/kitten aliases (Mac-only tools — eza et al. work if
+#                                      installed via scoop/cargo, see below)
+#   - tmux helpers (tn/ta/tk/runall)  (no native tmux on Windows)
+#   - DEC 2031 / mouse-tracking hooks (ghostty-specific, irrelevant here)
+#   - conda / nvm lazy-loaders        (paths differ; add when miniconda/nvm-windows install)
+
+# ── PSReadLine ──────────────────────────────────────────────────────────────
+# History: 5000 entries, no dups (mirrors HISTSIZE/hist_ignore_all_dups).
+Set-PSReadLineOption -MaximumHistoryCount 5000
+Set-PSReadLineOption -HistoryNoDuplicates
+Set-PSReadLineOption -HistorySearchCursorMovesToEnd
+
+# Closer to `bindkey -e` (zsh emacs mode).
+Set-PSReadLineOption -EditMode Emacs
+
+# Replaces zsh-autosuggestions: gray inline ghost text from history + plugins.
+Set-PSReadLineOption -PredictionSource HistoryAndPlugin
+Set-PSReadLineOption -PredictionViewStyle ListView
+
+# Mirror zsh keybindings for history search.
+Set-PSReadLineKeyHandler -Chord 'Ctrl+p' -Function HistorySearchBackward
+Set-PSReadLineKeyHandler -Chord 'Ctrl+n' -Function HistorySearchForward
+# Tab cycles through completions (more zsh-ish than the default).
+Set-PSReadLineKeyHandler -Chord 'Tab'        -Function MenuComplete
+Set-PSReadLineKeyHandler -Chord 'Shift+Tab'  -Function Complete
+
+# ── Env vars ────────────────────────────────────────────────────────────────
+$env:EDITOR = 'nvim'
+$env:RIPGREP_CONFIG_PATH = "$env:USERPROFILE\dots-windows\ripgrep\rg.conf"
+Remove-Item env:GH_TOKEN -ErrorAction SilentlyContinue
+
+# ── Prompt (oh-my-posh) ─────────────────────────────────────────────────────
+if (Get-Command oh-my-posh -ErrorAction SilentlyContinue) {
+    oh-my-posh init pwsh --config "$env:USERPROFILE\dots-windows\ohmyposh\zen.toml" |
+        Invoke-Expression
+}
+
+# ── Tool integrations ───────────────────────────────────────────────────────
+# zoxide — `cd` becomes the smart jumper (mirror `zoxide init --cmd cd zsh`).
+if (Get-Command zoxide -ErrorAction SilentlyContinue) {
+    Invoke-Expression (& { (zoxide init --cmd cd powershell | Out-String) })
+}
+
+# fzf integration via PSFzf (Ctrl+T file picker, Ctrl+R history fuzzy search).
+if (Get-Module -ListAvailable -Name PSFzf) {
+    Import-Module PSFzf
+    Set-PsFzfOption -PSReadlineChordProvider 'Ctrl+t' `
+                    -PSReadlineChordReverseHistory 'Ctrl+r'
+}
+
+# ── Aliases ─────────────────────────────────────────────────────────────────
+Set-Alias -Name e -Value exit
+Set-Alias -Name v -Value nvim
+
+if (Get-Command btop -ErrorAction SilentlyContinue) { Set-Alias top btop }
+if (Get-Command lazygit -ErrorAction SilentlyContinue) { Set-Alias lg lazygit }
+
+# eza if installed (`scoop install eza` / `cargo install eza`).
+if (Get-Command eza -ErrorAction SilentlyContinue) {
+    function ls { eza --icons=auto --hyperlink @args }
+    function ll { eza -la --git --icons=auto --hyperlink @args }
+    function lt { eza --tree --level=2 -a --git-ignore --icons=auto --hyperlink @args }
+}
+
+# ── Directory navigation ────────────────────────────────────────────────────
+function .. { Set-Location .. }
+function ... { Set-Location ../.. }
+
+function doc  { Set-Location "$env:USERPROFILE\Documents" }
+function dow  { Set-Location "$env:USERPROFILE\Downloads" }
+function des  { Set-Location "$env:USERPROFILE\Desktop" }
+function dots { Set-Location "$env:USERPROFILE\dots-windows" }
+# `cf` on mac jumped to ~/.config; on Windows the closest analog is the dots repo.
+function cf   { Set-Location "$env:USERPROFILE\dots-windows" }
+
+# ── Config-edit shortcuts ───────────────────────────────────────────────────
+# `zrc` kept as the muscle-memory name even though we're editing pwsh's profile.
+function zrc { nvim $PROFILE.CurrentUserAllHosts }
+function nrc { nvim "$env:LOCALAPPDATA\nvim\init.lua" }
+function rs  { Clear-Host; & (Get-Process -Id $PID).Path -NoLogo }   # restart shell
+function ch  {
+    $h = (Get-PSReadLineOption).HistorySavePath
+    if (Test-Path $h) { Remove-Item $h -Force }
+    Clear-Host
+}
+
+# ── Clipboard pwd (mirror `alias pwd='pwd | tee >(pbcopy)'`) ────────────────
+# Defined as a function so it shadows the built-in `pwd` alias only for
+# interactive use; scripts should use Get-Location directly.
+function pwd {
+    $p = (Get-Location).Path
+    $p | Set-Clipboard
+    Write-Output $p
+}
+
+# ── Update / upgrade ────────────────────────────────────────────────────────
+if (Get-Command topgrade -ErrorAction SilentlyContinue) {
+    function up { topgrade -t -y --no-retry }
+}
+
+# ── Editors ─────────────────────────────────────────────────────────────────
+# Pick code or cursor via fzf, like the zsh `k` function.
+function k {
+    if (-not (Get-Command fzf -ErrorAction SilentlyContinue)) {
+        Write-Error 'fzf not installed'; return
+    }
+    $editor = "code","cursor" | fzf --height=4 --prompt='editor: '
+    if (-not $editor) { return }
+    if ($args.Count -eq 0) { & $editor . } else { & $editor @args }
+}
+
+# ── Python shorthand ────────────────────────────────────────────────────────
+function p {
+    if ($args.Count -eq 0) { Write-Output 'python: no file given'; return }
+    python @args
+}
+
+# ── PR fetch (mirror gotopr) ────────────────────────────────────────────────
+function gotopr {
+    param([Parameter(Mandatory)] [string] $Url)
+    if ($Url -notmatch 'https://([^/]+)/([^/]+)/([^/]+)/pull/(\d+)') {
+        Write-Error "Could not parse URL: $Url"; return
+    }
+    $h, $org, $repo, $pr = $Matches[1..4]
+    Write-Host "==> PR #$pr in $h/$org/$repo"
+
+    $gitRoot = "$env:USERPROFILE\git"
+    if (-not (Test-Path $gitRoot)) { New-Item -ItemType Directory $gitRoot | Out-Null }
+    Set-Location $gitRoot
+
+    if (Test-Path $repo) {
+        Set-Location $repo
+        git fetch --prune
+    } else {
+        git clone "https://$h/$org/$repo.git"
+        Set-Location $repo
+    }
+    gh pr checkout $pr
+}

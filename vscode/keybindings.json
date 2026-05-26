@@ -1,0 +1,51 @@
+// Place your key bindings in this file to override the defaults
+[
+  {
+    "key": "ctrl+tab",
+    "command": "workbench.action.nextEditor",
+  },
+  {
+    "key": "ctrl+shift+tab",
+    "command": "workbench.action.previousEditor",
+  },
+  {
+    "key": "cmd+`",
+    "command": "workbench.action.toggleSidebarVisibility",
+    "when": "!isAuxiliaryWindowFocusedContext",
+  },
+  {
+    "key": "cmd+b",
+    "command": "-workbench.action.toggleSidebarVisibility",
+    "when": "!isAuxiliaryWindowFocusedContext",
+  },
+  {
+    "key": "ctrl+`",
+    "command": "workbench.action.toggleAuxiliaryBar",
+    "when": "!isAuxiliaryWindowFocusedContext",
+  },
+  {
+    "key": "alt+cmd+b",
+    "command": "-workbench.action.toggleAuxiliaryBar",
+    "when": "!isAuxiliaryWindowFocusedContext",
+  },
+  {
+    "key": "ctrl+`",
+    "command": "-workbench.action.terminal.toggleTerminal",
+    "when": "terminal.active",
+  },
+  {
+    "key": "ctrl+f",
+    "command": "workbench.action.maximizeChatSize",
+    "when": "cursor.agentIdeUnification.enabled",
+  },
+  {
+    "key": "alt+cmd+e",
+    "command": "-workbench.action.maximizeChatSize",
+    "when": "cursor.agentIdeUnification.enabled",
+  },
+  {
+    "key": "ctrl+f",
+    "command": "-cursorRight",
+    "when": "textInputFocus",
+  },
+]

@@ -1,0 +1,154 @@
+{
+  // ── WORKBENCH ─────────────────────────────────
+  "workbench.colorTheme": "Rosé Pine",
+  "workbench.iconTheme": "vscode-icons",
+  "window.title": " ",
+  "window.commandCenter": false,
+  "workbench.layoutControl.enabled": false,
+  "workbench.sideBar.location": "left",
+  "workbench.statusBar.visible": true,
+  "workbench.browser.showInTitleBar": false,
+
+  // Editor title actions
+  "workbench.editor.editorActionsLocation": "titleBar",
+  "workbench.editor.editorActionsHideItems": ["workbench.action.openChat"],
+
+  // Tabs
+  "workbench.editor.showTabs": "multiple",
+  "workbench.editor.tabActionCloseVisibility": false,
+
+  // Explorer
+  "explorer.confirmDelete": false,
+  "explorer.confirmDragAndDrop": false,
+  "workbench.tree.indent": 16, // default (8)
+  "workbench.tree.renderIndentGuides": "none",
+  "explorer.decorations.colors": false,
+
+  // ── EDITOR ────────────────────────────────────
+
+  // Font
+  "editor.fontFamily": "JetBrainsMono Nerd Font",
+  "editor.fontLigatures": true,
+  "editor.fontSize": 14,
+  "editor.lineHeight": 28,
+
+  // Layout
+  "editor.lineNumbers": "on",
+  "editor.glyphMargin": true,
+  "editor.minimap.enabled": false,
+  "breadcrumbs.enabled": false,
+  "editor.padding.top": 14,
+  "editor.padding.bottom": 14,
+
+  // Scrollbars & ruler
+  "editor.overviewRulerBorder": false,
+  "editor.scrollbar.horizontal": "hidden",
+  "editor.scrollbar.verticalScrollbarSize": 14,
+
+  // Word wrap
+  "editor.wordWrap": "bounded",
+  "editor.wordWrapColumn": 100,
+
+  // Brackets & guides
+  "editor.foldingHighlight": false,
+  "editor.matchBrackets": "never",
+  "editor.bracketPairColorization.enabled": false,
+  "editor.guides.highlightActiveBracketPair": false,
+  "editor.guides.bracketPairsHorizontal": false,
+  "editor.guides.indentation": false,
+  "editor.guides.highlightActiveIndentation": false,
+
+  // Cursor & scrolling
+  "editor.smoothScrolling": true,
+  "editor.cursorBlinking": "solid",
+  "editor.cursorSmoothCaretAnimation": "on",
+  "editor.renderLineHighlight": "none",
+
+  // Suggestions & hints
+  "editor.inlineSuggest.enabled": true,
+  "editor.parameterHints.enabled": false,
+  "editor.inlayHints.enabled": "off",
+
+  // Formatting
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+  },
+
+  // Accessibility
+  "editor.accessibilitySupport": "off",
+
+  // ── TERMINAL ──────────────────────────────────
+  "terminal.integrated.fontSize": 14,
+  "terminal.integrated.enableMultiLinePasteWarning": "never",
+  "terminal.integrated.inheritEnv": false,
+
+  // ── GIT ───────────────────────────────────────
+  "git.confirmSync": false,
+  "git.autofetch": true,
+  "git.enableSmartCommit": true,
+  "git.openRepositoryInParentFolders": "never",
+  "git.ignoreRebaseWarning": true,
+
+  // ── LANGUAGE-SPECIFIC ─────────────────────────
+  "C_Cpp.default.compilerPath": "/opt/homebrew/bin/g++-14",
+  "C_Cpp.default.intelliSenseMode": "macos-gcc-arm64",
+  "C_Cpp.default.cppStandard": "c++20",
+  "python.defaultInterpreterPath": "/opt/homebrew/Caskroom/miniconda/base",
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+  },
+  "[typescript]": {
+    "editor.formatOnSave": false,
+    "editor.formatOnPaste": false,
+  },
+  "[typescriptreact]": {
+    "editor.formatOnSave": false,
+    "editor.formatOnPaste": false,
+  },
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter",
+    "editor.formatOnSave": true,
+  },
+
+  // ── EXTENSIONS ────────────────────────────────
+
+  // Claude Code
+  "claudeCode.preferredLocation": "panel",
+  "claudeCode.allowDangerouslySkipPermissions": true,
+  "claudeCode.disableLoginPrompt": true,
+  "claudeCode.hideOnboarding": true,
+  "claudeCode.initialPermissionMode": "bypassPermissions",
+
+  // GitHub Copilot
+  "github.copilot.enable": { "*": false },
+  "github.copilot.editor.enableAutoCompletions": false,
+  "github.copilot.editor.enableCodeActions": false,
+  "github.copilot.nextEditSuggestions.enabled": false,
+  "github.copilot.renameSuggestions.triggerAutomatically": false,
+  "chat.commandCenter.enabled": false,
+
+  // Docker
+  "containers.containerClient": "com.microsoft.visualstudio.containers.docker",
+  "containers.orchestratorClient": "com.microsoft.visualstudio.orchestrators.dockercompose",
+  "docker.extension.enableComposeLanguageServer": false,
+
+  // Misc
+  "liveServer.settings.donotShowInfoMsg": true,
+  "workbench.editorAssociations": {
+    "*.copilotmd": "vscode.markdown.preview.editor",
+  },
+  "remote.SSH.connectTimeout": 1800,
+  "remote.SSH.serverShutdownTimeout": 28800,
+  "security.promptForRemoteFileProtocolHandling": false,
+}
