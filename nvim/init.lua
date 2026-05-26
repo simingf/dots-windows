@@ -638,13 +638,7 @@ require("lazy").setup({
 	{
 		"williamboman/mason.nvim",
 		enabled = not IS_SSH,
-		opts = {
-			-- Crashdummyy registry provides the `roslyn` LSP package used by roslyn.nvim.
-			registries = {
-				"github:mason-org/mason-registry",
-				"github:Crashdummyy/mason-registry",
-			},
-		},
+		opts = {},
 	},
 	{ "neovim/nvim-lspconfig" },
 	{
@@ -656,7 +650,6 @@ require("lazy").setup({
 			"saghen/blink.cmp",
 		},
 		config = function()
-			-- C# is handled separately by roslyn.nvim (not listed here).
 			local servers = { "gopls", "pyright", "clangd", "lua_ls", "bashls" }
 
 			-- Defaults applied to every server (blink.cmp capabilities).
@@ -717,7 +710,6 @@ require("lazy").setup({
 				zsh = { "shfmt" },
 				cpp = { "clang_format" },
 				c = { "clang_format" },
-				cs = { "csharpier" },
 			},
 			format_on_save = function(bufnr)
 				if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then
@@ -737,21 +729,9 @@ require("lazy").setup({
 			ensure_installed = {
 				"goimports",
 				"gofumpt",
-				"ruff",
 				"stylua",
 				"shfmt",
-				"clang-format",
-				"csharpier",
-				"roslyn", -- C# LSP, consumed by roslyn.nvim
 			},
 		},
-	},
-
-	-- roslyn.nvim: Microsoft's Roslyn-based C# LSP (replaces omnisharp).
-	-- Auto-discovers the server installed by Mason via the Crashdummyy registry.
-	{
-		"seblyng/roslyn.nvim",
-		ft = "cs",
-		opts = {},
 	},
 })

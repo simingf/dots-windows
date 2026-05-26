@@ -10,7 +10,7 @@ nvim --version 2>&1 | Select-Object -First 5
 
 Write-Host ""
 Write-Host "=== Tools Mason expects on PATH ==="
-@('git', 'curl', 'tar', 'unzip', 'go', 'gofmt', 'dotnet', 'python', 'pip', 'cargo', 'npm', 'node') | ForEach-Object {
+@('git', 'curl', 'tar', 'unzip', 'go', 'gofmt', 'python', 'pip', 'cargo', 'npm', 'node', 'ruff', 'clang-format') | ForEach-Object {
     $cmd = Get-Command $_ -ErrorAction SilentlyContinue
     if ($cmd) {
         Write-Host ("  {0,-10} {1}" -f $_, $cmd.Source)

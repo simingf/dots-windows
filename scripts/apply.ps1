@@ -172,13 +172,15 @@ if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
         'ajeetdsouza.zoxide',
         'eza-community.eza',
         'junegunn.fzf',
-        # Toolchains Mason needs to install nvim LSPs/formatters/linters.
-        # Go: gopls, goimports, gofumpt. Node: pyright, bashls.
-        # Python: ruff (Mason's package shells out to python). LLVM: clang-format.
+        # Toolchains Mason needs for nvim LSPs/formatters.
+        # Go: gopls, goimports, gofumpt. Node: pyright, bashls. Python: pyright.
+        # ruff and clang-format ship as single binaries — install directly,
+        # not via Mason (Mason's pip/npm shims are flaky on Windows).
         'GoLang.Go',
         'OpenJS.NodeJS.LTS',
         'Python.Python.3.13',
-        'LLVM.LLVM'
+        'LLVM.LLVM',
+        'astral-sh.ruff'
     ) | ForEach-Object { Winget-Install $_ }
 
     # winget put binaries on PATH (in registry), but the running session still
