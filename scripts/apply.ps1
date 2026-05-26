@@ -86,7 +86,10 @@ New-Link -Source "$Repo\vscode\keybindings.json"   -Target "$env:APPDATA\Code\Us
 New-Link -Source "$Repo\gh\config.yml"             -Target "$env:APPDATA\GitHub CLI\config.yml"
 New-Link -Source "$Repo\lazygit\config.yml"        -Target "$env:APPDATA\lazygit\config.yml"
 New-Link -Source "$Repo\claude\CLAUDE.md"          -Target "$env:USERPROFILE\.claude\CLAUDE.md"
-New-Link -Source "$Repo\powershell\profile.ps1"    -Target $PROFILE.CurrentUserAllHosts
+# PS7 and WinPS 5.1 use different profile paths — link both so either host loads it.
+$docs = [Environment]::GetFolderPath('MyDocuments')
+New-Link -Source "$Repo\powershell\profile.ps1"    -Target "$docs\PowerShell\Profile.ps1"
+New-Link -Source "$Repo\powershell\profile.ps1"    -Target "$docs\WindowsPowerShell\profile.ps1"
 New-Link -Source "$Repo\windowsterminal\settings.json" -Target "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
 
 # -- 2. Env vars -------------------------------------------------------------

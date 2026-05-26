@@ -64,6 +64,7 @@ if (Get-Module -ListAvailable -Name PSFzf) {
 # -- Aliases -----------------------------------------------------------------
 Set-Alias -Name e -Value exit
 Set-Alias -Name v -Value nvim
+Set-Alias -Name c -Value Clear-Host
 
 if (Get-Command btop -ErrorAction SilentlyContinue) { Set-Alias top btop }
 if (Get-Command lazygit -ErrorAction SilentlyContinue) { Set-Alias lg lazygit }
