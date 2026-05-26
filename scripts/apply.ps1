@@ -43,6 +43,26 @@ if (-not (Test-CanSymlink)) {
     exit 1
 }
 
+function Copy-Push {
+    # For apps that atomic-rename their config (Windows Terminal), which would
+    # break a symlink. Pushes from repo -> install path; manual edits in the
+    # app's UI get clobbered on next apply (repo is source of truth).
+    param(
+        [Parameter(Mandatory)] [string] $Source,
+        [Parameter(Mandatory)] [string] $Target
+    )
+    if (-not (Test-Path -LiteralPath $Source)) {
+        Warn "Source missing, skipping: $Source"
+        return
+    }
+    $parent = Split-Path -Parent $Target
+    if ($parent -and -not (Test-Path -LiteralPath $parent)) {
+        New-Item -ItemType Directory -Path $parent -Force | Out-Null
+    }
+    Copy-Item -LiteralPath $Source -Destination $Target -Force
+    Info "Copied $Target"
+}
+
 function New-Link {
     param(
         [Parameter(Mandatory)] [string] $Source,
@@ -90,7 +110,8 @@ New-Link -Source "$Repo\claude\CLAUDE.md"          -Target "$env:USERPROFILE\.cl
 $docs = [Environment]::GetFolderPath('MyDocuments')
 New-Link -Source "$Repo\powershell\profile.ps1"    -Target "$docs\PowerShell\Profile.ps1"
 New-Link -Source "$Repo\powershell\profile.ps1"    -Target "$docs\WindowsPowerShell\profile.ps1"
-New-Link -Source "$Repo\windowsterminal\settings.json" -Target "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
+# WT does atomic-rename on settings save, which breaks symlinks. Copy instead.
+Copy-Push -Source "$Repo\windowsterminal\settings.json" -Target "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
 
 # -- 2. Env vars -------------------------------------------------------------
 # Avoid [Environment]::SetEnvironmentVariable(..., 'User') — it broadcasts
