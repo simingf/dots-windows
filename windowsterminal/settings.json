@@ -1,24 +1,13 @@
 {
-    "$help": "https://aka.ms/terminal-documentation",
     "$schema": "https://aka.ms/terminal-profiles-schema",
     "defaultProfile": "PowerShell",
-    "copyOnSelect": false,
-    "copyFormatting": "none",
     "profiles": {
         "defaults": {
             "font": {
                 "face": "JetBrainsMono Nerd Font"
             },
-            "startingDirectory": "%USERPROFILE%"
-        },
-        "list": [
-            {
-                "name": "PowerShell",
-                "source": "Windows.Terminal.PowershellCore",
-                "elevate": true
-            }
-        ]
-    },
-    "schemes": [],
-    "actions": []
+            "startingDirectory": "%USERPROFILE%",
+            "elevate": true
+        }
+    }
 }
