@@ -152,6 +152,10 @@ end
 -- native binaries (Mason, blink.cmp Rust fuzzy). False locally on macOS, so a no-op.
 local IS_SSH = (vim.env.SSH_CONNECTION or "") ~= ""
 
+-- HAS_DOTNET: gate the C# / roslyn toolchain. True on the work Mac, false on the
+-- personal Windows box. Lets a single init.lua serve all 3 hosts.
+local HAS_DOTNET = vim.fn.executable("dotnet") == 1
+
 -- setup code from documentation --
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.uv.fs_stat(lazypath) then
@@ -638,7 +642,15 @@ require("lazy").setup({
 	{
 		"williamboman/mason.nvim",
 		enabled = not IS_SSH,
-		opts = {},
+		opts = {
+			-- Crashdummyy registry provides the `roslyn` LSP package used by roslyn.nvim.
+			registries = HAS_DOTNET and {
+				"github:mason-org/mason-registry",
+				"github:Crashdummyy/mason-registry",
+			} or {
+				"github:mason-org/mason-registry",
+			},
+		},
 	},
 	{ "neovim/nvim-lspconfig" },
 	{
@@ -650,6 +662,7 @@ require("lazy").setup({
 			"saghen/blink.cmp",
 		},
 		config = function()
+			-- C# is handled separately by roslyn.nvim (not listed here).
 			local servers = { "gopls", "pyright", "clangd", "lua_ls", "bashls" }
 
 			-- Defaults applied to every server (blink.cmp capabilities).
@@ -710,6 +723,7 @@ require("lazy").setup({
 				zsh = { "shfmt" },
 				cpp = { "clang_format" },
 				c = { "clang_format" },
+				cs = { "csharpier" },
 			},
 			format_on_save = function(bufnr)
 				if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then
@@ -726,12 +740,32 @@ require("lazy").setup({
 		enabled = not IS_SSH,
 		dependencies = { "williamboman/mason.nvim" },
 		opts = {
-			ensure_installed = {
+			ensure_installed = HAS_DOTNET and {
 				"goimports",
 				"gofumpt",
+				"ruff",
 				"stylua",
 				"shfmt",
+				"clang-format",
+				"csharpier",
+				"roslyn", -- C# LSP, consumed by roslyn.nvim
+			} or {
+				"goimports",
+				"gofumpt",
+				"ruff",
+				"stylua",
+				"shfmt",
+				"clang-format",
 			},
 		},
+	},
+
+	-- roslyn.nvim: Microsoft's Roslyn-based C# LSP (replaces omnisharp).
+	-- Auto-discovers the server installed by Mason via the Crashdummyy registry.
+	{
+		"seblyng/roslyn.nvim",
+		enabled = HAS_DOTNET,
+		ft = "cs",
+		opts = {},
 	},
 })
