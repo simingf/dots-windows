@@ -8,9 +8,9 @@ For repo layout, bootstrap, and concepts (ASCII-only PowerShell, LF line endings
 
 When the user asks you to edit a file in this repo, route based on its sync class:
 
-- **Byte-identical** with Mac (`nvim/`, `vscode/*.json`, `lazygit/config.yml`, `ohmyposh/zen.toml`, `gh/config.yml`, `ripgrep/rg.conf`): edit `~/dots-macos/<path>` instead — never this repo's copy. Then run `~/dots-macos/scripts/sync-dotfiles.py --apply` as part of the same task.
-- **Partial** (`powershell/profile.ps1`, `claude/CLAUDE.md`): edit here. If the change is generic enough to belong on Mac too, also edit `~/dots-macos/<path>` — translating zsh→PowerShell or dropping Roblox-specific bits as appropriate.
-- **Windows-only** (`windowsterminal/`, `scripts/apply.ps1`): edit here.
+- **Byte-identical** with Mac (`AppData/Local/nvim/`, `AppData/Roaming/Code/User/*.json`, `AppData/Roaming/lazygit/config.yml`, `AppData/Roaming/GitHub CLI/config.yml`, `ohmyposh/zen.toml`, `ripgrep/rg.conf`, `.claude/CLAUDE.md`): edit the Mac source instead — never this repo's copy. Then run `~/dots-macos/scripts/sync-dotfiles.py --apply` as part of the same task.
+- **Partial** (`Documents/PowerShell/Profile.ps1`): edit here. If the change is generic enough to belong on Mac too, also edit `~/dots-macos/<path>` — translating zsh→PowerShell as appropriate.
+- **Windows-only** (`AppData/Local/Packages/Microsoft.WindowsTerminal_…/`, `scripts/apply.ps1`): edit here.
 
 Default: shared files must stay aligned. Don't end a task that touched a byte-identical file without running the sync script. **Never run git operations against this repo from the Mac** — see Constraints.
 
@@ -26,10 +26,9 @@ The user commits/pushes from the **Windows box**, not the Mac (see constraints b
 
 ## Windows-side partials
 
-The sync script only handles byte-identical files. Two files in this repo intentionally diverge from Mac and require LLM judgment to mirror:
+The sync script only handles byte-identical files. One file in this repo intentionally diverges from Mac and requires LLM judgment to mirror:
 
-- **`powershell/profile.ps1`** — hand-translated subset of `~/dots-macos/.zshrc`. When mirroring a new shared alias/function: translate zsh→PowerShell, skipping Mac-only tools (`eza`, `trash`, `pbcopy`, oh-my-posh, homebrew, tmux, sapling, conda/nvm). The file's header documents what was intentionally skipped.
-- **`claude/CLAUDE.md`** — the global Claude config. Roblox-specific bits (Sapling, Silencer, github.rbx.com paths, work role line) live only on Mac; Windows uses `Set-Clipboard` instead of `pbcopy`. When mirroring shared rules, drop the work-only sections and substitute Windows equivalents.
+- **`Documents/PowerShell/Profile.ps1`** — hand-translated subset of `~/dots-macos/.zshrc`. When mirroring a new shared alias/function: translate zsh→PowerShell, skipping Mac-only tools (`eza`, `trash`, `pbcopy`, oh-my-posh, homebrew, tmux, sapling, conda/nvm). The file's header documents what was intentionally skipped.
 
 ## Constraints
 

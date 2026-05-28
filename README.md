@@ -42,26 +42,24 @@ Manual after a successful run: `gh auth login` (interactive browser flow), shell
 
 ## Layout
 
-One top-level directory per app. The symlink script (`scripts/apply.ps1`) maps each into its Windows install path:
+The repo mirrors `%USERPROFILE%`: each file lives at the same path it'll occupy on the Windows box, so the symlink script (`scripts/apply.ps1`) maps `$Repo\<path>` → `$env:USERPROFILE\<path>`. Two dirs (`ohmyposh/`, `ripgrep/`) sit at the top level because they aren't symlinked anywhere — they're read directly from the repo via env var / PowerShell init.
 
-| Repo path                      | Windows install path                                  |
-| ------------------------------ | ----------------------------------------------------- |
-| `nvim/`                        | `%LOCALAPPDATA%\nvim\`                                |
-| `powershell/profile.ps1`       | `$PROFILE.CurrentUserAllHosts`                        |
-| `ohmyposh/zen.toml`            | loaded from PowerShell profile via `oh-my-posh init pwsh --config ...` |
-| `gh/config.yml`                | `%APPDATA%\GitHub CLI\config.yml`                     |
-| `ripgrep/rg.conf`              | location set by `$env:RIPGREP_CONFIG_PATH`            |
-| `lazygit/config.yml`           | `%APPDATA%\lazygit\config.yml`                        |
-| `vscode/settings.json`         | `%APPDATA%\Code\User\settings.json`                   |
-| `vscode/keybindings.json`      | `%APPDATA%\Code\User\keybindings.json`                |
-| `claude/CLAUDE.md`             | `%USERPROFILE%\.claude\CLAUDE.md` (global Claude config) |
-| `windowsterminal/settings.json`| `%LOCALAPPDATA%\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json` |
+| Repo path                                                                                          | Windows install path                                              |
+| -------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| `AppData/Local/nvim/`                                                                              | `%LOCALAPPDATA%\nvim\`                                            |
+| `AppData/Local/Packages/Microsoft.WindowsTerminal_8wekyb3d8bbwe/LocalState/settings.json`          | same (under `%LOCALAPPDATA%`); copied not symlinked               |
+| `AppData/Roaming/Code/User/{settings,keybindings}.json`                                            | same (under `%APPDATA%`)                                          |
+| `AppData/Roaming/GitHub CLI/config.yml`                                                            | same (under `%APPDATA%`)                                          |
+| `AppData/Roaming/lazygit/config.yml`                                                               | same (under `%APPDATA%`)                                          |
+| `Documents/PowerShell/Profile.ps1`                                                                 | same (under `%USERPROFILE%`); also linked to `WindowsPowerShell\profile.ps1` for PS5.1 |
+| `.claude/CLAUDE.md`                                                                                | same (under `%USERPROFILE%`); global Claude Code config           |
+| `ohmyposh/zen.toml`                                                                                | not installed — loaded from `Profile.ps1` via `oh-my-posh init pwsh --config $Repo\ohmyposh\zen.toml` |
+| `ripgrep/rg.conf`                                                                                  | not installed — `RIPGREP_CONFIG_PATH` env var points at `$Repo\ripgrep\rg.conf` |
 
 ## Things you can ask Claude (run from the Mac)
 
 - **"sync my dotfiles"** — runs `~/dots-macos/scripts/sync-dotfiles.py --apply` (byte-identical files).
-- **"port this Mac alias to Windows"** — translate a `~/dots-macos/.zshrc` change into PowerShell inside `powershell/profile.ps1`, skipping Mac-only tools.
-- **"update the global Claude config"** — hand-mirror `~/dots-macos/.claude/CLAUDE.md` → `claude/CLAUDE.md`, dropping Roblox-specific bits and using `Set-Clipboard` instead of `pbcopy`.
+- **"port this Mac alias to Windows"** — translate a `~/dots-macos/.zshrc` change into PowerShell inside `Documents/PowerShell/Profile.ps1`, skipping Mac-only tools.
 
 Git operations on this repo happen on the Windows box, not the Mac (Silencer MITM proxy intercepts `github.com` TLS) — Claude on the Mac edits files only; the user pushes from Windows.
 
@@ -72,7 +70,7 @@ Git operations on this repo happen on the Windows box, not the Mac (Silencer MIT
 Windows PowerShell 5.1 reads `.ps1` files as the OS ANSI codepage unless the file has a UTF-8 BOM. Any em-dash (`—`), box-drawing char (`─`), or other non-ASCII byte gets mis-decoded and the parser throws confusing _"missing closing bracket"_ errors a few lines later. Check before committing:
 
 ```bash
-LC_ALL=C grep -nP '[^\x00-\x7f]' scripts/apply.ps1 powershell/profile.ps1
+LC_ALL=C grep -nP '[^\x00-\x7f]' scripts/apply.ps1 Documents/PowerShell/Profile.ps1
 ```
 
 (macOS editors tend to strip BOMs on save, so just sticking to ASCII is the durable fix.)
