@@ -108,18 +108,19 @@ function New-Link {
 Step "Repo: $Repo"
 
 Step "Symlinks"
-New-Link -Source "$Repo\nvim"                      -Target "$env:LOCALAPPDATA\nvim"
-New-Link -Source "$Repo\vscode\settings.json"      -Target "$env:APPDATA\Code\User\settings.json"
-New-Link -Source "$Repo\vscode\keybindings.json"   -Target "$env:APPDATA\Code\User\keybindings.json"
-New-Link -Source "$Repo\gh\config.yml"             -Target "$env:APPDATA\GitHub CLI\config.yml"
-New-Link -Source "$Repo\lazygit\config.yml"        -Target "$env:APPDATA\lazygit\config.yml"
-New-Link -Source "$Repo\claude\CLAUDE.md"          -Target "$env:USERPROFILE\.claude\CLAUDE.md"
-# PS7 and WinPS 5.1 use different profile paths — link both so either host loads it.
+# Repo paths mirror their %USERPROFILE%-relative install paths.
+New-Link -Source "$Repo\AppData\Local\nvim"                                        -Target "$env:LOCALAPPDATA\nvim"
+New-Link -Source "$Repo\AppData\Roaming\Code\User\settings.json"                   -Target "$env:APPDATA\Code\User\settings.json"
+New-Link -Source "$Repo\AppData\Roaming\Code\User\keybindings.json"                -Target "$env:APPDATA\Code\User\keybindings.json"
+New-Link -Source "$Repo\AppData\Roaming\GitHub CLI\config.yml"                     -Target "$env:APPDATA\GitHub CLI\config.yml"
+New-Link -Source "$Repo\AppData\Roaming\lazygit\config.yml"                        -Target "$env:APPDATA\lazygit\config.yml"
+New-Link -Source "$Repo\.claude\CLAUDE.md"                                         -Target "$env:USERPROFILE\.claude\CLAUDE.md"
+# PS7 and WinPS 5.1 use different profile paths — link both to the PS7-cased source.
 $docs = [Environment]::GetFolderPath('MyDocuments')
-New-Link -Source "$Repo\powershell\profile.ps1"    -Target "$docs\PowerShell\Profile.ps1"
-New-Link -Source "$Repo\powershell\profile.ps1"    -Target "$docs\WindowsPowerShell\profile.ps1"
+New-Link -Source "$Repo\Documents\PowerShell\Profile.ps1"                          -Target "$docs\PowerShell\Profile.ps1"
+New-Link -Source "$Repo\Documents\PowerShell\Profile.ps1"                          -Target "$docs\WindowsPowerShell\profile.ps1"
 # WT does atomic-rename on settings save, which breaks symlinks. Copy instead.
-Copy-Push -Source "$Repo\windowsterminal\settings.json" -Target "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
+Copy-Push -Source "$Repo\AppData\Local\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json" -Target "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
 
 # -- 2. Env vars -------------------------------------------------------------
 # Avoid [Environment]::SetEnvironmentVariable(..., 'User') — it broadcasts
