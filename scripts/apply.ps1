@@ -61,11 +61,10 @@ function Copy-Push {
     }
     # If $Target is an existing symlink, Copy-Item -Force writes *through* the
     # link instead of replacing it, defeating the whole point. Drop it first.
-    if (Test-Path -LiteralPath $Target) {
-        $existing = Get-Item -LiteralPath $Target -Force -ErrorAction SilentlyContinue
-        if ($existing.LinkType -eq 'SymbolicLink') {
-            Remove-Item -LiteralPath $Target -Force
-        }
+    # Use Get-Item (not Test-Path) so broken symlinks are still detected.
+    $existing = Get-Item -LiteralPath $Target -Force -ErrorAction SilentlyContinue
+    if ($existing -and $existing.LinkType -eq 'SymbolicLink') {
+        Remove-Item -LiteralPath $Target -Force
     }
     Copy-Item -LiteralPath $Source -Destination $Target -Force
     Info "Copied $Target"
@@ -84,8 +83,10 @@ function New-Link {
     if ($parent -and -not (Test-Path -LiteralPath $parent)) {
         New-Item -ItemType Directory -Path $parent -Force | Out-Null
     }
-    if (Test-Path -LiteralPath $Target) {
-        $existing = Get-Item -LiteralPath $Target -Force
+    # Use Get-Item (not Test-Path) so broken symlinks left over from a prior
+    # layout are still detected and backed up rather than silently overwritten.
+    $existing = Get-Item -LiteralPath $Target -Force -ErrorAction SilentlyContinue
+    if ($existing) {
         if ($existing.LinkType -eq 'SymbolicLink' -and $existing.Target -contains $Source) {
             Info "OK    $Target"
             return
@@ -115,7 +116,7 @@ New-Link -Source "$Repo\AppData\Roaming\Code\User\keybindings.json"             
 New-Link -Source "$Repo\AppData\Roaming\GitHub CLI\config.yml"                     -Target "$env:APPDATA\GitHub CLI\config.yml"
 New-Link -Source "$Repo\AppData\Roaming\lazygit\config.yml"                        -Target "$env:APPDATA\lazygit\config.yml"
 New-Link -Source "$Repo\.claude\CLAUDE.md"                                         -Target "$env:USERPROFILE\.claude\CLAUDE.md"
-# PS7 and WinPS 5.1 use different profile paths — link both to the PS7-cased source.
+# PS7 and WinPS 5.1 use different profile paths - link both to the PS7-cased source.
 $docs = [Environment]::GetFolderPath('MyDocuments')
 New-Link -Source "$Repo\Documents\PowerShell\Profile.ps1"                          -Target "$docs\PowerShell\Profile.ps1"
 New-Link -Source "$Repo\Documents\PowerShell\Profile.ps1"                          -Target "$docs\WindowsPowerShell\profile.ps1"
@@ -123,7 +124,7 @@ New-Link -Source "$Repo\Documents\PowerShell\Profile.ps1"                       
 Copy-Push -Source "$Repo\AppData\Local\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json" -Target "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
 
 # -- 2. Env vars -------------------------------------------------------------
-# Avoid [Environment]::SetEnvironmentVariable(..., 'User') — it broadcasts
+# Avoid [Environment]::SetEnvironmentVariable(..., 'User') - it broadcasts
 # WM_SETTINGCHANGE synchronously to every top-level window and can hang for
 # minutes if any of them isn't pumping messages. Writing HKCU:\Environment
 # directly is instant; new processes pick it up at launch.
@@ -175,7 +176,7 @@ if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
         'junegunn.fzf',
         # Toolchains Mason needs for nvim LSPs/formatters.
         # Go: gopls, goimports, gofumpt. Node: pyright, bashls. Python: pyright.
-        # ruff and clang-format ship as single binaries — install directly,
+        # ruff and clang-format ship as single binaries - install directly,
         # not via Mason (Mason's pip/npm shims are flaky on Windows).
         'GoLang.Go',
         'OpenJS.NodeJS.LTS',
