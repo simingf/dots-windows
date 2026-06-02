@@ -24,7 +24,7 @@ User commits/pushes from the **Windows box** (not the Mac — see constraints).
 
 ## Windows-side partials
 
-- **`Documents/PowerShell/Profile.ps1`** — hand-translated subset of `~/dots-macos/.zshrc`. When mirroring a shared alias/function: translate zsh→PowerShell, skip Mac-only tools (`eza`, `trash`, `pbcopy`, oh-my-posh, homebrew, tmux, sapling, conda/nvm). Profile header documents intentional skips.
+- **`Documents/PowerShell/Profile.ps1`** — hand-translated subset of `~/dots-macos/.zshrc`. When mirroring a shared alias/function: translate zsh→PowerShell, skip Mac-only tools (`trash`, `pbcopy`, oh-my-posh, homebrew, tmux, sapling, conda/nvm). Profile header documents intentional skips. eza is installed via winget (see apply.ps1) and aliased in the profile.
 
 ## Constraints
 

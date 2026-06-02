@@ -4,8 +4,7 @@
 #
 # What was intentionally skipped from the zsh side:
 #   - Homebrew shellenv               (no brew on Windows)
-#   - eza/trash/pbcopy/kitten aliases (Mac-only tools - eza et al. work if
-#                                      installed via scoop/cargo, see below)
+#   - trash/pbcopy/kitten aliases     (Mac-only tools)
 #   - tmux helpers (tn/ta/tk/runall)  (no native tmux on Windows)
 #   - DEC 2031 / mouse-tracking hooks (ghostty-specific, irrelevant here)
 #   - conda / nvm lazy-loaders        (paths differ; add when miniconda/nvm-windows install)
@@ -94,7 +93,7 @@ function cpr {
 if (Get-Command btop -ErrorAction SilentlyContinue) { Set-Alias top btop }
 if (Get-Command lazygit -ErrorAction SilentlyContinue) { Set-Alias lg lazygit }
 
-# eza if installed (`scoop install eza` / `cargo install eza`).
+# eza (installed via winget by apply.ps1).
 # PS resolves aliases before functions, so the built-in `ls` alias (for
 # Get-ChildItem) shadows our function unless we drop it first.
 if (Get-Command eza -ErrorAction SilentlyContinue) {
