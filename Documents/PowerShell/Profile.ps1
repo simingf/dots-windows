@@ -170,8 +170,10 @@ function k {
     if ($args.Count -eq 0) { & $editor . } else { & $editor @args }
 }
 
-# Claude Code with permission prompts off (yolo mode).
-function kk { claude --dangerously-skip-permissions @args }
+# Claude Code aliases.
+function claude_ { claude --dangerously-skip-permissions --model 'claude-opus-4-6[1m]' @args }
+Set-Alias -Name kk -Value claude_
+function pi { claude_ --pi @args }
 
 # -- Python shorthand --------------------------------------------------------
 function p {

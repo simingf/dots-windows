@@ -8,7 +8,7 @@ For repo layout, bootstrap, and concepts (ASCII-only PowerShell, LF line endings
 
 Route file edits by sync class:
 
-- **Byte-identical** with Mac (`AppData/Local/nvim/`, `AppData/Roaming/Code/User/*.json`, `AppData/Roaming/lazygit/config.yml`, `AppData/Roaming/GitHub CLI/config.yml`, `ohmyposh/zen.toml`, `ripgrep/rg.conf`, `.claude/CLAUDE.md`): edit the Mac source, never this repo's copy. Run `~/dots-macos/scripts/sync-dotfiles.py --apply` in the same task.
+- **Byte-identical** with Mac (`AppData/Local/nvim/`, `AppData/Roaming/Code/User/*.json`, `AppData/Roaming/lazygit/config.yml`, `AppData/Roaming/GitHub CLI/config.yml`, `ohmyposh/zen.toml`, `ripgrep/rg.conf`, `.claude/CLAUDE.md`, `.claude/statusline-command.sh`): edit the Mac source, never this repo's copy. Run `~/dots-macos/scripts/sync-dotfiles.py --apply` in the same task.
 - **Partial** (`Documents/PowerShell/Profile.ps1`): edit here. If generic enough for Mac too, also edit `~/dots-macos/<path>` — translate zsh→PowerShell.
 - **Windows-only** (`AppData/Local/Packages/Microsoft.WindowsTerminal_…/`, `scripts/apply.ps1`): edit here.
 

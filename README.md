@@ -53,6 +53,7 @@ The repo mirrors `%USERPROFILE%`: each file lives at the same path it'll occupy 
 | `AppData/Roaming/lazygit/config.yml`                                                               | same (under `%APPDATA%`)                                          |
 | `Documents/PowerShell/Profile.ps1`                                                                 | same (under `%USERPROFILE%`); also linked to `WindowsPowerShell\profile.ps1` for PS5.1 |
 | `.claude/CLAUDE.md`                                                                                | same (under `%USERPROFILE%`); global Claude Code config           |
+| `.claude/statusline-command.sh`                                                                    | same (under `%USERPROFILE%`); Claude Code status-line renderer    |
 | `ohmyposh/zen.toml`                                                                                | not installed — loaded from `Profile.ps1` via `oh-my-posh init pwsh --config $Repo\ohmyposh\zen.toml` |
 | `ripgrep/rg.conf`                                                                                  | not installed — `RIPGREP_CONFIG_PATH` env var points at `$Repo\ripgrep\rg.conf` |
 
