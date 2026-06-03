@@ -171,7 +171,7 @@ function k {
 }
 
 # Claude Code aliases.
-function claude_ { claude --dangerously-skip-permissions --model 'claude-opus-4-6[1m]' @args }
+function claude_ { claude --dangerously-skip-permissions --model claude-opus-4-6 @args }
 Set-Alias -Name kk -Value claude_
 function pi { claude_ --pi @args }
 
