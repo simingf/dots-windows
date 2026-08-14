@@ -13,9 +13,9 @@ vim.api.nvim_create_autocmd({ "BufEnter", "BufWinEnter" }, {
 		vim.opt.titlestring = title
 	end,
 })
--- enable line numbers
+-- enable absolute line numbers
 vim.opt.number = true
-vim.opt.relativenumber = true
+vim.opt.relativenumber = false
 -- keep sign column on
 vim.opt.signcolumn = "yes"
 -- highlight current line
@@ -114,6 +114,20 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 	group = vim.api.nvim_create_augroup("highlight-yank", { clear = true }),
 	callback = function()
 		vim.hl.on_yank()
+	end,
+})
+-- auto-reload buffers when the file changes on disk (e.g. edits from an agent
+-- or git). autoread reloads only on events, so poke :checktime on focus/idle to
+-- force the mtime check. Unmodified buffers reload in place; if you have unsaved
+-- changes nvim warns instead of clobbering them. Idle refresh is gated by
+-- 'updatetime' (default 4000ms) via CursorHold.
+vim.opt.autoread = true
+vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold", "CursorHoldI" }, {
+	desc = "reload buffer if the underlying file changed on disk",
+	callback = function()
+		if vim.fn.mode() ~= "c" then
+			vim.cmd("checktime")
+		end
 	end,
 })
 -- bind 0 to ^ and L to $ (H is taken by arrow.nvim)
@@ -220,7 +234,7 @@ require("lazy").setup({
 					-- section_separators = { left = '', right = '' },
 					section_separators = "",
 					disabled_filetypes = {
-						statusline = {},
+						statusline = { "neo-tree" },
 						winbar = {},
 					},
 					ignore_focus = {},
@@ -273,6 +287,36 @@ require("lazy").setup({
 	},
 	{
 		"Isrothy/lualine-diagnostic-message",
+	},
+
+	-- bufferline: open buffers as clickable tabs across the top. Mouse clicks
+	-- select tabs (mouse = "a"); [b / ]b cycle and <leader>bp jumps by letter.
+	-- offsets shifts the bar right of the neo-tree sidebar so they don't overlap;
+	-- rose-pine themes the highlights automatically.
+	{
+		"akinsho/bufferline.nvim",
+		version = "*",
+		event = "VeryLazy",
+		dependencies = { "nvim-tree/nvim-web-devicons" },
+		opts = {
+			options = {
+				mode = "buffers", -- every buffer is a tab (not vim tabpages)
+				diagnostics = "nvim_lsp",
+				offsets = {
+					{
+						filetype = "neo-tree",
+						text = "File Explorer",
+						highlight = "Directory",
+						separator = true,
+					},
+				},
+			},
+		},
+		keys = {
+			{ "[b", "<cmd>BufferLineCyclePrev<cr>", desc = "prev buffer" },
+			{ "]b", "<cmd>BufferLineCycleNext<cr>", desc = "next buffer" },
+			{ "<leader>bp", "<cmd>BufferLinePick<cr>", desc = "pick buffer" },
+		},
 	},
 
 	-- git indicators on the left
@@ -559,13 +603,18 @@ require("lazy").setup({
 			"MunifTanjim/nui.nvim",
 		},
 		init = function()
-			-- load neo-tree eagerly when nvim starts on a directory so it replaces
-			-- netrw in place; otherwise it stays lazy behind the keymap/cmd.
-			if vim.fn.argc(-1) == 1 then
-				local stat = vim.uv.fs_stat(vim.fn.argv(0))
-				if stat and stat.type == "directory" then
-					require("neo-tree")
-				end
+			-- directory arg (`nvim .`): load neo-tree eagerly so it hijacks netrw
+			-- in place. file arg(s): show it as a sidebar (no focus steal) once
+			-- startup finishes. no args: stay lazy behind the keymap/cmd.
+			local argc = vim.fn.argc(-1)
+			if argc == 0 then
+				return
+			end
+			local stat = vim.uv.fs_stat(vim.fn.argv(0))
+			if argc == 1 and stat and stat.type == "directory" then
+				require("neo-tree")
+			else
+				vim.api.nvim_create_autocmd("VimEnter", { once = true, command = "Neotree show" })
 			end
 		end,
 		keys = {
@@ -584,9 +633,22 @@ require("lazy").setup({
 			},
 		},
 		opts = {
+			filesystem = {
+				-- auto-refresh the tree when files change on disk out-of-band
+				-- (agents, git, mv) — off by default, so the sidebar otherwise
+				-- only updates on its own actions or a manual `R`.
+				use_libuv_file_watcher = true,
+				-- show all hidden items (dotfiles + gitignored), displayed dimmed.
+				-- `H` toggles them off/on at runtime.
+				filtered_items = {
+					visible = true,
+					hide_dotfiles = false,
+					hide_gitignored = false,
+				},
+			},
 			window = {
 				position = "left",
-				width = 32,
+				width = 40,
 				-- Colemak-DH: `i` (right) opens/expands, `m` (left) collapses.
 				-- `n` (down) falls through to the global remap; neo-tree binds `e`
 				-- to toggle_auto_expand_width, so release it ("none" skips the
@@ -849,5 +911,27 @@ require("lazy").setup({
 		enabled = HAS_DOTNET,
 		ft = "cs",
 		opts = {},
+	},
+
+	-- claudecode.nvim: implements the Claude Code IDE protocol (WebSocket + lock
+	-- file in ~/.claude/ide/) so the standalone `claude` CLI can attach to this
+	-- nvim and open its file diffs as native diff buffers. Flow: launch nvim,
+	-- then in a separate claude pane run /ide and pick this instance. event =
+	-- "VeryLazy" + auto_start (default) brings the server up on startup so /ide
+	-- finds it. Skipped on the Linux dev box (no internet to fetch the plugin).
+	{
+		"coder/claudecode.nvim",
+		enabled = not IS_SSH,
+		event = "VeryLazy",
+		dependencies = { "folke/snacks.nvim" },
+		config = true,
+		keys = {
+			{ "<leader>a", nil, desc = "claude code" },
+			{ "<leader>ac", "<cmd>ClaudeCode<cr>", desc = "toggle claude terminal" },
+			{ "<leader>ab", "<cmd>ClaudeCodeAdd %<cr>", desc = "add buffer to context" },
+			{ "<leader>as", "<cmd>ClaudeCodeSend<cr>", mode = "v", desc = "send selection" },
+			{ "<leader>aa", "<cmd>ClaudeCodeDiffAccept<cr>", desc = "accept diff" },
+			{ "<leader>ad", "<cmd>ClaudeCodeDiffDeny<cr>", desc = "deny diff" },
+		},
 	},
 })
