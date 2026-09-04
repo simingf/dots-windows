@@ -68,4 +68,22 @@ return {
 		dependencies = { "nvim-treesitter/nvim-treesitter", "nvim-tree/nvim-web-devicons" },
 		opts = {},
 	},
+
+	-- markdown-preview: live browser preview (real HTML tables wrap per-column).
+	-- enabled off on the headless Linux dev box (no browser, no internet for the build).
+	-- build downloads the prebuilt server binary (no node/yarn toolchain needed). lazy runs
+	-- build before the plugin is sourced, so force-load first or mkdp#util#install is E117.
+	{
+		"iamcco/markdown-preview.nvim",
+		enabled = not env.IS_SSH,
+		cmd = { "MarkdownPreview", "MarkdownPreviewStop", "MarkdownPreviewToggle" },
+		ft = { "markdown" },
+		keys = {
+			{ "<leader>p", "<cmd>MarkdownPreviewToggle<cr>", desc = "markdown preview" },
+		},
+		build = function()
+			vim.cmd("Lazy! load markdown-preview.nvim")
+			vim.fn["mkdp#util#install"]()
+		end,
+	},
 }
