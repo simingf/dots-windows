@@ -31,7 +31,7 @@ If PowerShell complains _"running scripts is disabled on this system"_, set the 
 Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
 ```
 
-`apply.ps1` does, in order: symlinks → `RIPGREP_CONFIG_PATH` → winget installs (Git, gh, Neovim, ripgrep, fd, lazygit, oh-my-posh, VS Code, zoxide, eza, fzf, PS7) → JetBrainsMono Nerd Font → PSFzf module → baseline `git config` → VS Code extensions. Idempotent — re-running is cheap.
+`apply.ps1` does, in order: symlinks (incl. `.config/git/ignore`) → `RIPGREP_CONFIG_PATH` → `YAZI_CONFIG_HOME` / `YAZI_FILE_ONE` → winget installs (Git, gh, Neovim, ripgrep, fd, lazygit, oh-my-posh, VS Code, zoxide, eza, fzf, yazi, glow, jq, PS7) → JetBrainsMono Nerd Font → PSFzf module → baseline `git config` (incl. `include.path` → `.config/git/common.inc`) → VS Code extensions. Idempotent — re-running is cheap.
 
 Flags:
 
@@ -42,7 +42,7 @@ Manual after a successful run: `gh auth login` (interactive browser flow), shell
 
 ## Layout
 
-The repo mirrors `%USERPROFILE%`: each file lives at the same path it'll occupy on the Windows box, so the symlink script (`scripts/apply.ps1`) maps `$Repo\<path>` → `$env:USERPROFILE\<path>`. Two dirs (`ohmyposh/`, `ripgrep/`) sit at the top level because they aren't symlinked anywhere — they're read directly from the repo via env var / PowerShell init.
+The repo mirrors `%USERPROFILE%`: each file lives at the same path it'll occupy on the Windows box, so the symlink script (`scripts/apply.ps1`) maps `$Repo\<path>` → `$env:USERPROFILE\<path>`. A few `.config/` files aren't symlinked at all — they're read straight from the repo via env var, `Profile.ps1`, or git `include.path` (marked "not installed" below).
 
 | Repo path                                                                                          | Windows install path                                              |
 | -------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
@@ -54,13 +54,18 @@ The repo mirrors `%USERPROFILE%`: each file lives at the same path it'll occupy 
 | `Documents/PowerShell/Profile.ps1`                                                                 | same (under `%USERPROFILE%`); also linked to `WindowsPowerShell\profile.ps1` for PS5.1 |
 | `.claude/CLAUDE.md`                                                                                | same (under `%USERPROFILE%`); global Claude Code config           |
 | `.claude/statusline-command.sh`                                                                    | same (under `%USERPROFILE%`); Claude Code status-line renderer    |
-| `ohmyposh/zen.toml`                                                                                | not installed — loaded from `Profile.ps1` via `oh-my-posh init pwsh --config $Repo\ohmyposh\zen.toml` |
-| `ripgrep/rg.conf`                                                                                  | not installed — `RIPGREP_CONFIG_PATH` env var points at `$Repo\ripgrep\rg.conf` |
+| `.claude/settings.json`                                                                            | same (under `%USERPROFILE%`); Windows-only - wires the status line + rose-pine theme (no work MCP allowlist) |
+| `.claude/themes/rose-pine.json`                                                                    | same (under `%USERPROFILE%`); Claude Code custom theme |
+| `.config/yazi/`                                                                                    | same (under `%USERPROFILE%`); `YAZI_CONFIG_HOME` points here |
+| `.config/git/common.inc`                                                                           | not installed - pulled into global git config via `include.path` (pull/push defaults + rose-pine colors) |
+| `.config/git/ignore`                                                                               | same (under `%USERPROFILE%`); git's default global excludesfile |
+| `.config/ohmyposh/zen.toml`                                                                        | not installed - loaded from `Profile.ps1` via `oh-my-posh init pwsh --config $Repo\.config\ohmyposh\zen.toml` |
+| `.config/ripgrep/rg.conf`                                                                          | not installed - `RIPGREP_CONFIG_PATH` env var points at `$Repo\.config\ripgrep\rg.conf` |
 
 ## Things you can ask Claude (run from the Mac)
 
 - **"sync my dotfiles"** — runs `~/dots-macos/scripts/sync-dotfiles.py --apply` (byte-identical files).
-- **"port this Mac alias to Windows"** — translate a `~/dots-macos/.zshrc` change into PowerShell inside `Documents/PowerShell/Profile.ps1`, skipping Mac-only tools.
+- **"port this Mac alias to Windows"** — translate a change in the `~/dots-macos/.config/zsh/` modules into PowerShell inside `Documents/PowerShell/Profile.ps1`, skipping Mac-only tools and anything work-related.
 
 Git operations on this repo happen on the Windows box, not the Mac (Silencer MITM proxy intercepts `github.com` TLS) — Claude on the Mac edits files only; the user pushes from Windows.
 
@@ -78,17 +83,17 @@ LC_ALL=C grep -nP '[^\x00-\x7f]' scripts/apply.ps1 Documents/PowerShell/Profile.
 
 ### LF line endings
 
-The byte-identical files are stored with LF endings (Mac side normalized). Don't let Windows re-save them as CRLF — it would break the byte-identical sync.
+The byte-identical files are stored with LF endings (Mac side normalized). Don't let Windows re-save them as CRLF — it would break the byte-identical sync. `.gitattributes` pins `*.sh` to LF so a `core.autocrlf=true` checkout can't break the Git Bash status-line script.
 
 ### Not ported from dots-macos
 
-- `.zshrc`, `.tmux.conf` — PowerShell setup; no zsh/tmux on native Windows.
+- `.zshrc`, `.config/zsh/`, `.tmux.conf`, tmux scripts, Claude tmux hooks — PowerShell setup; no zsh/tmux on native Windows.
+- Work-only shell helpers (`sup`/sapling, `metalg`/`activelg`, `pullrepos`, `ro`) and the Mac `.claude/settings.json` (work MCP allowlist) — this repo stays work-free.
 - `kitty/`, `ghostty/`, `aerospace/`, `karabiner/`, `borders/`, `linearmouse/`, `portpal/` — macOS-only.
 - `Brewfile`, `manual/` — macOS-only.
-- `.gitconfig` — too many macOS-specific paths (GCM, Homebrew gh, `/Users/sfeng`); written fresh by `apply.ps1`.
+- `.gitconfig` — credentials are platform-specific; `apply.ps1` writes the Windows bits and includes the shared `.config/git/common.inc`.
 - `Library/Preferences/sapling/` — macOS-only.
 
 ## TODO
 
-- [ ] Decide whether a checked-in Windows `.gitconfig` is worth it (currently configured manually per `apply.ps1` step).
-- [ ] Port more `.zshrc` functions as the need arises — easier to translate one-at-a-time than guess up front.
+- [ ] Port more zsh-module functions as the need arises — easier to translate one-at-a-time than guess up front.

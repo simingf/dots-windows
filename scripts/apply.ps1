@@ -124,6 +124,14 @@ New-Link -Source "$Repo\AppData\Roaming\Code\User\keybindings.json"             
 New-Link -Source "$Repo\AppData\Roaming\GitHub CLI\config.yml"                     -Target "$env:APPDATA\GitHub CLI\config.yml"
 New-Link -Source "$Repo\AppData\Roaming\lazygit\config.yml"                        -Target "$env:APPDATA\lazygit\config.yml"
 New-Link -Source "$Repo\.claude\CLAUDE.md"                                         -Target "$env:USERPROFILE\.claude\CLAUDE.md"
+# File-level: ~/.claude also holds runtime state (history, sessions, projects).
+New-Link -Source "$Repo\.claude\settings.json"                                     -Target "$env:USERPROFILE\.claude\settings.json"
+New-Link -Source "$Repo\.claude\statusline-command.sh"                             -Target "$env:USERPROFILE\.claude\statusline-command.sh"
+New-Link -Source "$Repo\.claude\themes\rose-pine.json"                             -Target "$env:USERPROFILE\.claude\themes\rose-pine.json"
+# Global git ignores: ~/.config/git/ignore is git's default excludesfile.
+New-Link -Source "$Repo\.config\git\ignore"                                        -Target "$env:USERPROFILE\.config\git\ignore"
+# yazi reads YAZI_CONFIG_HOME (set below); the glow plugin finds its style via ~/.config/yazi.
+New-Link -Source "$Repo\.config\yazi"                                              -Target "$env:USERPROFILE\.config\yazi"
 # PS7 and WinPS 5.1 use different profile paths - link both to the PS7-cased source.
 $docs = [Environment]::GetFolderPath('MyDocuments')
 New-Link -Source "$Repo\Documents\PowerShell\Profile.ps1"                          -Target "$docs\PowerShell\Profile.ps1"
@@ -137,10 +145,25 @@ Copy-Push -Source "$Repo\AppData\Local\Packages\Microsoft.WindowsTerminal_8wekyb
 # minutes if any of them isn't pumping messages. Writing HKCU:\Environment
 # directly is instant; new processes pick it up at launch.
 Step "Env vars (User scope)"
-$rgPath = Join-Path $Repo 'ripgrep\rg.conf'
+$rgPath = Join-Path $Repo '.config\ripgrep\rg.conf'
 Set-ItemProperty -Path 'HKCU:\Environment' -Name 'RIPGREP_CONFIG_PATH' -Value $rgPath -Type String
 $env:RIPGREP_CONFIG_PATH = $rgPath
 Info "RIPGREP_CONFIG_PATH = $rgPath"
+
+$yaziPath = "$env:USERPROFILE\.config\yazi"
+Set-ItemProperty -Path 'HKCU:\Environment' -Name 'YAZI_CONFIG_HOME' -Value $yaziPath -Type String
+$env:YAZI_CONFIG_HOME = $yaziPath
+Info "YAZI_CONFIG_HOME = $yaziPath"
+
+# yazi needs file(1) for mime detection; Git for Windows ships one.
+$fileExe = "$env:ProgramFiles\Git\usr\bin\file.exe"
+if (Test-Path -LiteralPath $fileExe) {
+    Set-ItemProperty -Path 'HKCU:\Environment' -Name 'YAZI_FILE_ONE' -Value $fileExe -Type String
+    $env:YAZI_FILE_ONE = $fileExe
+    Info "YAZI_FILE_ONE = $fileExe"
+} else {
+    Warn "file.exe not found (Git for Windows not installed yet?) - re-run after the winget step for yazi previews."
+}
 
 if ($LinksOnly) {
     Write-Host ""
@@ -151,8 +174,13 @@ if ($LinksOnly) {
 # -- 3. winget tools ---------------------------------------------------------
 function Winget-Install {
     param([Parameter(Mandatory)] [string] $Id)
-    & winget install --id $Id --silent --accept-source-agreements --accept-package-agreements 2>&1 |
-        Out-Null
+    Info "...   $Id"
+    # Not piped to Out-Null: winget only draws its download/install progress bars
+    # when writing straight to the console. --source winget skips the msstore
+    # source (slow, can prompt); --disable-interactivity makes winget fail
+    # instead of waiting on a hidden prompt.
+    & winget install --id $Id --exact --source winget --silent --disable-interactivity `
+        --accept-source-agreements --accept-package-agreements
     # Exit codes: 0 = installed, -1978335135 = already installed, -1978335189 = no upgrade
     if ($LASTEXITCODE -eq 0 -or
         $LASTEXITCODE -eq -1978335135 -or
@@ -182,6 +210,9 @@ if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
         'ajeetdsouza.zoxide',
         'eza-community.eza',
         'junegunn.fzf',
+        'sxyazi.yazi',
+        'charmbracelet.glow',           # yazi markdown previewer (glow.yazi plugin)
+        'jqlang.jq',                    # Claude status line (statusline-command.sh)
         # Toolchains Mason needs for nvim LSPs/formatters.
         # Go: gopls, goimports, gofumpt. Node: pyright, bashls. Python: pyright.
         # ruff and clang-format ship as single binaries - install directly,
@@ -225,11 +256,15 @@ if (-not (Get-Module -ListAvailable -Name PSFzf)) {
 # -- 6. git baseline config --------------------------------------------------
 if (Get-Command git -ErrorAction SilentlyContinue) {
     Step "git config (global)"
-    git config --global push.autoSetupRemote true
     git config --global credential.helper manager
     # Per-host gh credential helpers
     git config --global 'credential.https://github.com.helper'      '!gh auth git-credential'
     git config --global 'credential.https://gist.github.com.helper' '!gh auth git-credential'
+    # pull/push defaults + rose-pine colors, byte-identical with dots-macos.
+    $commonInc = (Join-Path $Repo '.config\git\common.inc') -replace '\\', '/'
+    if (@(git config --global --get-all include.path) -notcontains $commonInc) {
+        git config --global --add include.path $commonInc
+    }
 
     if (-not $GitUserName) {
         $existing = git config --global --get user.name
