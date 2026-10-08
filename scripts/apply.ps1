@@ -91,9 +91,17 @@ function New-Link {
             Info "OK    $Target"
             return
         }
-        $backup = "$Target.bak"
-        Warn "Backing up $Target -> $backup"
-        Move-Item -LiteralPath $Target -Destination $backup -Force
+        if ($existing.LinkType -eq 'SymbolicLink') {
+            # Stale link (e.g. into a pre-rename repo path, possibly broken).
+            # Move-Item can't move a broken link, and there's nothing to back up.
+            # .Delete() removes only the link, never the target's contents.
+            Warn "Replacing stale link $Target"
+            $existing.Delete()
+        } else {
+            $backup = "$Target.bak"
+            Warn "Backing up $Target -> $backup"
+            Move-Item -LiteralPath $Target -Destination $backup -Force
+        }
     }
     try {
         New-Item -ItemType SymbolicLink -Path $Target -Target $Source -Force | Out-Null
