@@ -100,6 +100,7 @@ if (Get-Module -ListAvailable -Name PSFzf) {
 # so wrap in a function. nvim is a real exe so Set-Alias is fine.
 function e { exit }
 Set-Alias -Name v -Value nvim
+Set-Alias -Name g -Value git
 
 # `c`: clear and re-list (mirror dots-linux pattern, not Mac's conda dispatcher).
 function c { Clear-Host; ls }
