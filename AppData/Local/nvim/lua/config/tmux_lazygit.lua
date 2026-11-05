@@ -17,24 +17,25 @@ vim.system({ "tmux", "set-option", "-p", "-t", pane, "@nvim_server", vim.v.serve
 -- not the explorer or a float — out of insert mode. Scheduled so the RPC returns at once.
 function _G.TmuxLazygitEdit(file, line)
 	vim.schedule(function()
-		local function normal(w)
-			return vim.bo[vim.api.nvim_win_get_buf(w)].buftype == "" and vim.api.nvim_win_get_config(w).relative == ""
-		end
-		if not normal(0) then
-			for _, w in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
-				if normal(w) then
-					vim.api.nvim_set_current_win(w)
-					break
-				end
-			end
-		end
 		vim.cmd.stopinsert()
-		vim.cmd("drop " .. vim.fn.fnameescape(file))
+		require("config.tabs").open(file)
 		if line > 0 then
 			pcall(vim.api.nvim_win_set_cursor, 0, { line, 0 })
 			vim.cmd("normal! zz")
 		end
 	end)
+	return 0
+end
+
+-- called over RPC by tmux-nav.sh for prefix m/n/e/i (see config/nav.lua): TmuxNav moves
+-- one split toward dir (h/j/k/l) and returns 1 if nvim handled it, 0 at nvim's edge (tmux
+-- moves to the next pane instead); TmuxNavEnter lands on the entry-edge split when tmux
+-- moves into this pane.
+function _G.TmuxNav(dir)
+	return require("config.nav").move(dir) and 1 or 0
+end
+function _G.TmuxNavEnter(dir)
+	require("config.nav").enter(dir)
 	return 0
 end
 
