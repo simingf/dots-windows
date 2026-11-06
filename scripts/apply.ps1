@@ -210,13 +210,10 @@ if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
         'sxyazi.yazi',
         'charmbracelet.glow',           # yazi markdown previewer (glow.yazi plugin)
         'jqlang.jq',                    # Claude status line (statusline-command.sh)
-        # Toolchains Mason needs for nvim LSPs (Go: gopls/gofumpt, Node: pyright/bashls).
-        # ruff + clang-format (LLVM) installed directly: Mason's pip/npm shims are flaky here.
+        # Toolchains Mason needs for nvim LSPs (Go: gopls, Node: pyright/bashls).
         'GoLang.Go',
         'OpenJS.NodeJS.LTS',
-        'Python.Python.3.13',
-        'LLVM.LLVM',
-        'astral-sh.ruff'
+        'Python.Python.3.13'
     ) | ForEach-Object { Winget-Install $_ }
 
     # winget put binaries on PATH (in registry), but the running session still
