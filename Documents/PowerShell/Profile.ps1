@@ -1,7 +1,8 @@
 # PowerShell profile: hand-translated subset of the dots-macos zsh modules.
 # Linked by scripts/apply.ps1 for both pwsh and Windows PowerShell.
-# Not ported: work helpers (repo must stay work-free), brew, tmux helpers,
-# ghostty/mouse hooks, conda/nvm loaders.
+# Not ported: work helpers (repo must stay work-free), brew, tmux helpers (incl.
+# cpterm), ghostty/mouse hooks, conda/nvm loaders, `-` (pwsh has `cd -`).
+# `mkdir` already creates parents, so no `-p` alias.
 
 # -- PSReadLine --------------------------------------------------------------
 # History: 5000 entries, no dups (mirrors HISTSIZE/hist_ignore_all_dups).
@@ -89,9 +90,10 @@ if (Get-Module -ListAvailable -Name PSFzf) {
 
 # -- Aliases -----------------------------------------------------------------
 # `exit` is a language keyword, not a cmdlet - Set-Alias can't target it,
-# so wrap in a function. nvim is a real exe so Set-Alias is fine.
+# so wrap in a function.
 function e { exit }
-Set-Alias -Name v -Value nvim
+# v: nvim, defaulting to . (zsh v)
+function v { if ($args.Count) { nvim @args } else { nvim . } }
 Set-Alias -Name g -Value git
 
 # `c`: clear and re-list (mirror dots-linux pattern, not Mac's conda dispatcher).
@@ -203,12 +205,12 @@ function k {
 
 # Claude Code aliases.
 function claude_ { claude --dangerously-skip-permissions @args }
-Set-Alias -Name kk -Value claude_
-function pi { claude_ --pi @args }
+# kk: claude with flags + prompt; path args dropped (zsh kk outside tmux)
+function kk { claude_ @($args | Where-Object { "$_" -like '-*' -or -not (Test-Path -LiteralPath "$_") }) }
 
 # -- Python shorthand --------------------------------------------------------
 function p {
-    if ($args.Count -eq 0) { Write-Output 'python: no file given'; return }
+    if ($args.Count -eq 0) { [Console]::Error.WriteLine('python: no file given'); return }
     python @args
 }
 
