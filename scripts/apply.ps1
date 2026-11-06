@@ -44,9 +44,8 @@ if (-not (Test-CanSymlink)) {
 }
 
 function Copy-Push {
-    # For apps that atomic-rename their config (Windows Terminal), which would
-    # break a symlink. Pushes from repo -> install path; manual edits in the
-    # app's UI get clobbered on next apply (repo is source of truth).
+    # For apps that atomic-rename their config (Windows Terminal) and so break a
+    # symlink. Repo -> install path; UI edits get clobbered on next apply.
     param(
         [Parameter(Mandatory)] [string] $Source,
         [Parameter(Mandatory)] [string] $Target
@@ -140,10 +139,8 @@ New-Link -Source "$Repo\Documents\PowerShell\Profile.ps1"                       
 Copy-Push -Source "$Repo\AppData\Local\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json" -Target "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
 
 # -- 2. Env vars -------------------------------------------------------------
-# Avoid [Environment]::SetEnvironmentVariable(..., 'User') - it broadcasts
-# WM_SETTINGCHANGE synchronously to every top-level window and can hang for
-# minutes if any of them isn't pumping messages. Writing HKCU:\Environment
-# directly is instant; new processes pick it up at launch.
+# Write HKCU:\Environment directly: SetEnvironmentVariable(..., 'User') broadcasts
+# WM_SETTINGCHANGE synchronously and can hang for minutes.
 Step "Env vars (User scope)"
 $rgPath = Join-Path $Repo '.config\ripgrep\rg.conf'
 Set-ItemProperty -Path 'HKCU:\Environment' -Name 'RIPGREP_CONFIG_PATH' -Value $rgPath -Type String
@@ -213,10 +210,8 @@ if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
         'sxyazi.yazi',
         'charmbracelet.glow',           # yazi markdown previewer (glow.yazi plugin)
         'jqlang.jq',                    # Claude status line (statusline-command.sh)
-        # Toolchains Mason needs for nvim LSPs/formatters.
-        # Go: gopls, goimports, gofumpt. Node: pyright, bashls. Python: pyright.
-        # ruff and clang-format ship as single binaries - install directly,
-        # not via Mason (Mason's pip/npm shims are flaky on Windows).
+        # Toolchains Mason needs for nvim LSPs (Go: gopls/gofumpt, Node: pyright/bashls).
+        # ruff + clang-format (LLVM) installed directly: Mason's pip/npm shims are flaky here.
         'GoLang.Go',
         'OpenJS.NodeJS.LTS',
         'Python.Python.3.13',

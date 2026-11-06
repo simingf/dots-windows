@@ -1,15 +1,7 @@
-# PowerShell profile, hand-translated from the dots-macos zsh modules
-# (~/.config/zsh/*.zsh). Work-only pieces (sapling `sup`, work repo helpers) are
-# intentionally not ported - this repo must stay work-free.
-# Symlinked to $PROFILE.CurrentUserAllHosts by scripts/apply.ps1, so it loads
-# in pwsh, Windows PowerShell, and VS Code's integrated terminal.
-#
-# What was intentionally skipped from the zsh side:
-#   - Homebrew shellenv               (no brew on Windows)
-#   - trash/pbcopy/kitten aliases     (Mac-only tools)
-#   - tmux helpers (tn/ta/tk/runall)  (no native tmux on Windows)
-#   - DEC 2031 / mouse-tracking hooks (ghostty-specific, irrelevant here)
-#   - conda / nvm lazy-loaders        (paths differ; add when miniconda/nvm-windows install)
+# PowerShell profile: hand-translated subset of the dots-macos zsh modules.
+# Linked by scripts/apply.ps1 for both pwsh and Windows PowerShell.
+# Not ported: work helpers (repo must stay work-free), brew, tmux helpers,
+# ghostty/mouse hooks, conda/nvm loaders.
 
 # -- PSReadLine --------------------------------------------------------------
 # History: 5000 entries, no dups (mirrors HISTSIZE/hist_ignore_all_dups).
