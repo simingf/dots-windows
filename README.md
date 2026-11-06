@@ -7,7 +7,7 @@ Operational details (sync workflow, constraints, editing conventions) live in [`
 ## Sibling repos
 
 - [dots-macos](https://github.com/simingf/dots-macos) — **source of truth**, all sync flows from there.
-- [dots-linux](https://github.rbx.com/Roblox/dots-linux) — Coder Linux dev boxes (work).
+- dots-linux — Linux dev boxes (separate repo).
 
 ## Bootstrap
 
@@ -57,6 +57,7 @@ The repo mirrors `%USERPROFILE%`: each file lives at the same path it'll occupy 
 | `.claude/settings.json`                                                                            | same (under `%USERPROFILE%`); Windows-only - wires the status line + rose-pine theme (no work MCP allowlist) |
 | `.claude/themes/rose-pine.json`                                                                    | same (under `%USERPROFILE%`); Claude Code custom theme |
 | `.config/yazi/`                                                                                    | same (under `%USERPROFILE%`); `YAZI_CONFIG_HOME` points here |
+| `scripts/apply.ps1`, `.gitattributes`                                                              | not installed - bootstrap script; `.gitattributes` pins `*.sh` to LF |
 | `.config/git/common.inc`                                                                           | not installed - pulled into global git config via `include.path` (pull/push defaults + rose-pine colors) |
 | `.config/git/ignore`                                                                               | same (under `%USERPROFILE%`); git's default global excludesfile |
 | `.config/ohmyposh/zen.toml`                                                                        | not installed - loaded from `Profile.ps1` via `oh-my-posh init pwsh --config $Repo\.config\ohmyposh\zen.toml` |
@@ -67,7 +68,7 @@ The repo mirrors `%USERPROFILE%`: each file lives at the same path it'll occupy 
 - **"sync my dotfiles"** — runs `~/dots-macos/scripts/sync-dotfiles.py --apply` (byte-identical files).
 - **"port this Mac alias to Windows"** — translate a change in the `~/dots-macos/.config/zsh/` modules into PowerShell inside `Documents/PowerShell/Profile.ps1`, skipping Mac-only tools and anything work-related.
 
-Git operations on this repo happen on the Windows box, not the Mac (Silencer MITM proxy intercepts `github.com` TLS) — Claude on the Mac edits files only; the user pushes from Windows.
+Git operations on this repo happen on the Windows box, not the Mac (its network intercepts `github.com`) — Claude on the Mac edits files only; the user pushes from Windows.
 
 ## Concepts
 
@@ -88,11 +89,10 @@ The byte-identical files are stored with LF endings (Mac side normalized). Don't
 ### Not ported from dots-macos
 
 - `.zshrc`, `.config/zsh/`, `.tmux.conf`, tmux scripts, Claude tmux hooks — PowerShell setup; no zsh/tmux on native Windows.
-- Work-only shell helpers (`sup`/sapling, `metalg`/`activelg`, `pullrepos`, `ro`) and the Mac `.claude/settings.json` (work MCP allowlist) — this repo stays work-free.
-- `kitty/`, `ghostty/`, `aerospace/`, `karabiner/`, `borders/`, `linearmouse/`, `portpal/` — macOS-only.
+- Work-only shell helpers and the Mac `.claude/settings.json` — this repo stays work-free.
+- `kitty/`, `ghostty/`, `aerospace/`, `karabiner/`, `borders/`, `linearmouse/`, `alfred/`, `finicky/` — macOS-only.
 - `Brewfile`, `manual/` — macOS-only.
 - `.gitconfig` — credentials are platform-specific; `apply.ps1` writes the Windows bits and includes the shared `.config/git/common.inc`.
-- `Library/Preferences/sapling/` — macOS-only.
 
 ## TODO
 

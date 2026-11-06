@@ -24,12 +24,12 @@ User commits/pushes from the **Windows box** (not the Mac — see constraints).
 
 ## Windows-side partials
 
-- **`Documents/PowerShell/Profile.ps1`** — hand-translated subset of the `~/dots-macos/.config/zsh/` modules (shared ones: `50-aliases`, `60-functions`, `80-tools`, `00-env`). When mirroring a shared alias/function: translate zsh→PowerShell, skip Mac-only tools (`trash`, homebrew, tmux, conda/nvm) and all work-only helpers (sapling `sup`, work repo helpers). The rose-pine `LS_COLORS`, `FZF_DEFAULT_OPTS`, and PSReadLine colors are hand copies of `00-env.zsh` / `80-tools.zsh` — re-copy when the palette changes. Profile header documents intentional skips. eza is installed via winget (see apply.ps1) and aliased in the profile.
+- **`Documents/PowerShell/Profile.ps1`** — hand-translated subset of the `~/dots-macos/.config/zsh/` modules (shared ones: `50-aliases`, `60-functions`, `80-tools`, `00-env`). When mirroring a shared alias/function: translate zsh→PowerShell, skip Mac-only tools (`trash`, homebrew, tmux, conda/nvm) and all work-only helpers. The rose-pine `LS_COLORS`, `FZF_DEFAULT_OPTS`, and PSReadLine colors are hand copies of `00-env.zsh` / `80-tools.zsh` — re-copy when the palette changes. Profile header documents intentional skips. eza is installed via winget (see apply.ps1) and aliased in the profile.
 
 ## Constraints
 
-- **No work content.** This repo is public on github.com/simingf. No Roblox code, paths, hostnames, screenshots.
-- **No git operations from the Mac.** Roblox's Silencer MITM proxy intercepts `github.com` TLS and forcibly auths as the work GitHub identity, which 403s on `simingf/*` repos. Edit files locally; user pushes from the Windows box.
+- **No work content.** This repo is public on github.com/simingf. No work code, paths, hostnames, screenshots.
+- **No git operations from the Mac.** The Mac's network intercepts `github.com` and authenticates as a different GitHub identity, which 403s on `simingf/*` repos. Edit files locally; user pushes from the Windows box.
 
 ## Editing conventions
 
